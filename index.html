@@ -2645,8 +2645,8 @@ async function viewBill(billId){
 <style>
 
     .a5-invoice {
-        width:100%;
-        max-width:700px;
+    width:100%;
+    max-width:900px;
         margin:0 auto;
         background:#fff;
         color:#222;
@@ -2900,26 +2900,27 @@ async function viewBill(billId){
         }
 
         .a5-invoice {
-            position:absolute;
-            left:0;
-            top:0;
-            width:148mm;
-            max-width:148mm;
-            margin:0;
-            padding:0;
-            font-size:10px;
-        }
+    position:absolute;
+    left:0;
+    top:0;
+    width:210mm;
+    max-width:210mm;
+    margin:0 !important;
+    padding:0 !important;
+    font-size:9px;
+}
 
         .invoice-actions {
             display:none !important;
         }
 
-        .invoice-paper {
-    width:148mm;
-    min-height:auto;
+        ..invoice-paper {
+    width:210mm;
+    min-height:148mm;
     border:none;
     border-radius:0;
-    padding:3mm 3mm 8mm 3mm;
+    margin:0 !important;
+    padding:3mm 3mm 7mm 3mm;
 }
         .invoice-title h1 {
             font-size:20px;
@@ -2950,8 +2951,8 @@ async function viewBill(billId){
             width:240px;
         }
 
-       @page {
-    size:A5 portrait;
+      @page {
+    size:A5 landscape;
     margin:0;
 }
         }
