@@ -2188,7 +2188,190 @@ function comingSoon(name){
     );
 
 }
+async function openBillHistory(){
 
+    const app = document.getElementById("app");
+
+    app.innerHTML = `
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div>
+                    <h2>📋 Bill History</h2>
+                    <p style="margin:0;color:#666;">
+                        आपके बनाए गए सभी bills
+                    </p>
+                </div>
+
+                <button class="btn"
+                        onclick="loadDashboard()">
+                    ← Dashboard
+                </button>
+            </div>
+
+            <div id="billHistoryList" style="margin-top:20px;">
+                <p>Loading bills...</p>
+            </div>
+        </div>
+    `;
+
+    await loadBillHistory();
+}
+
+
+async function loadBillHistory(){
+
+    const list = document.getElementById("billHistoryList");
+
+    if(!list) return;
+
+    const {
+        data: bills,
+        error
+    } = await db
+        .from("bills")
+        .select(`
+            id,
+            invoice_number,
+            customer_name,
+            customer_mobile,
+            grand_total,
+            paid_amount,
+            due_amount,
+            payment_status,
+            payment_mode,
+            created_at
+        `)
+        .order("created_at", {
+            ascending:false
+        });
+
+    if(error){
+
+        console.error(error);
+
+        list.innerHTML = `
+            <div style="padding:15px;color:#b00020;">
+                Bill History load नहीं हो सकी।
+                <br>
+                ${error.message}
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if(!bills || bills.length === 0){
+
+        list.innerHTML = `
+            <div style="text-align:center;padding:30px;color:#666;">
+                <div style="font-size:40px;">📋</div>
+                <h3>कोई Bill नहीं मिला</h3>
+                <p>जब आप नया bill बनाएँगे, वह यहाँ दिखाई देगा।</p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML = bills.map(bill => {
+
+        const date = new Date(
+            bill.created_at
+        ).toLocaleString("en-IN", {
+            dateStyle:"medium",
+            timeStyle:"short"
+        });
+
+        return `
+            <div style="
+                border:1px solid #ddd;
+                border-radius:12px;
+                padding:15px;
+                margin-bottom:12px;
+                background:#fff;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:10px;
+                    flex-wrap:wrap;
+                ">
+
+                    <div>
+                        <strong>
+                            ${bill.invoice_number}
+                        </strong>
+
+                        <div style="
+                            color:#666;
+                            margin-top:5px;
+                        ">
+                            ${bill.customer_name || "Walk-in Customer"}
+                        </div>
+
+                        ${
+                            bill.customer_mobile
+                            ? `<div style="color:#666;">
+                                📱 ${bill.customer_mobile}
+                              </div>`
+                            : ""
+                        }
+                    </div>
+
+
+                    <div style="text-align:right;">
+
+                        <strong style="font-size:18px;">
+                            ₹${Number(bill.grand_total || 0).toFixed(2)}
+                        </strong>
+
+                        <div style="margin-top:5px;">
+                            ${bill.payment_status || "paid"}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div style="
+                    margin-top:12px;
+                    padding-top:10px;
+                    border-top:1px solid #eee;
+                    color:#555;
+                ">
+
+                    Paid:
+                    ₹${Number(bill.paid_amount || 0).toFixed(2)}
+
+                    &nbsp; | &nbsp;
+
+                    Due:
+                    ₹${Number(bill.due_amount || 0).toFixed(2)}
+
+                    &nbsp; | &nbsp;
+
+                    ${bill.payment_mode || "cash"}
+
+                </div>
+
+
+                <div style="
+                    margin-top:8px;
+                    font-size:13px;
+                    color:#888;
+                ">
+                    ${date}
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+}
 
 /* =========================================
    LOGOUT
