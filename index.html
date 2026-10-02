@@ -2404,24 +2404,146 @@ async function viewBill(billId){
 
                     <div>
 
-                        <h2 style="margin:0;">
-                            Invoice
-                        </h2>
+                       <div style="
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    border-bottom:2px solid #222;
+    padding-bottom:20px;
+">
 
-                        <p style="margin:8px 0 0;">
-                            <strong>
-                                ${bill.invoice_number}
-                            </strong>
-                        </p>
+    <!-- BUSINESS DETAILS -->
 
-                        <p style="
-                            margin:5px 0 0;
-                            color:#666;
-                        ">
-                            ${date}
-                        </p>
+    <div style="
+        flex:1;
+        min-width:240px;
+    ">
 
-                    </div>
+        ${
+            business && business.logo_url
+            ? `
+                <img
+                    src="${business.logo_url}"
+                    alt="Business Logo"
+                    style="
+                        max-width:90px;
+                        max-height:70px;
+                        object-fit:contain;
+                        margin-bottom:8px;
+                    "
+                >
+              `
+            : ""
+        }
+
+        <h2 style="
+            margin:0;
+            font-size:24px;
+        ">
+            ${business?.business_name || "Your Business"}
+        </h2>
+
+        ${
+            business?.owner_name
+            ? `
+                <p style="margin:5px 0;">
+                    <strong>Owner:</strong>
+                    ${business.owner_name}
+                </p>
+              `
+            : ""
+        }
+
+        ${
+            business?.address || business?.city
+            ? `
+                <p style="
+                    margin:5px 0;
+                    color:#555;
+                ">
+                    ${business.address || ""}
+                    ${business.city ? ", " + business.city : ""}
+                    ${business.state ? ", " + business.state : ""}
+                    ${business.pincode ? " - " + business.pincode : ""}
+                </p>
+              `
+            : ""
+        }
+
+        ${
+            business?.mobile
+            ? `
+                <p style="margin:5px 0;">
+                    📱 ${business.mobile}
+                </p>
+              `
+            : ""
+        }
+
+        ${
+            business?.email
+            ? `
+                <p style="margin:5px 0;">
+                    ✉️ ${business.email}
+                </p>
+              `
+            : ""
+        }
+
+        ${
+            business?.gstin
+            ? `
+                <p style="margin:5px 0;">
+                    <strong>GSTIN:</strong>
+                    ${business.gstin}
+                </p>
+              `
+            : ""
+        }
+
+    </div>
+
+
+    <!-- INVOICE DETAILS -->
+
+    <div style="
+        min-width:200px;
+        text-align:right;
+    ">
+
+        <h2 style="
+            margin:0;
+            font-size:24px;
+        ">
+            TAX INVOICE
+        </h2>
+
+        <p style="margin:8px 0 0;">
+            <strong>
+                Invoice No:
+            </strong>
+            ${bill.invoice_number}
+        </p>
+
+        <p style="
+            margin:5px 0 0;
+            color:#666;
+        ">
+            <strong>Date:</strong>
+            ${date}
+        </p>
+
+        <p style="
+            margin:8px 0 0;
+            font-weight:bold;
+        ">
+            ${bill.payment_status || "paid"}
+        </p>
+
+    </div>
+
+</div>
 
 
                     <div style="text-align:right;">
