@@ -2693,9 +2693,10 @@ async function loadBillHistory(){
         error
     } = await db
         .from("bills")
-        .select(`
-            id,
-            invoice_number,
+       .select(`
+    id,
+    admin_id,
+    invoice_number,
             customer_name,
             customer_mobile,
             grand_total,
