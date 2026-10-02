@@ -16,22 +16,22 @@
 }
 
 body{
-    min-height:100vh;
     background:#f4f7fb;
     color:#172033;
+    min-height:100vh;
 }
 
 .header{
-    background:#ffffff;
+    background:#fff;
     border-bottom:1px solid #e5e9f0;
-    padding:18px 6%;
+    padding:16px 5%;
     display:flex;
     justify-content:space-between;
     align-items:center;
 }
 
 .logo{
-    font-size:24px;
+    font-size:23px;
     font-weight:800;
 }
 
@@ -39,28 +39,34 @@ body{
     color:#2563eb;
 }
 
-.lang{
+.header-right{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.lang,.logout{
     border:1px solid #d7dce5;
-    background:white;
-    padding:8px 14px;
+    background:#fff;
+    padding:9px 14px;
     border-radius:8px;
     cursor:pointer;
 }
 
 .container{
-    max-width:1100px;
-    margin:45px auto;
+    max-width:1150px;
+    margin:30px auto;
     padding:20px;
 }
 
 .hero{
     text-align:center;
-    margin-bottom:30px;
+    margin-bottom:25px;
 }
 
 .hero h1{
-    font-size:38px;
-    margin-bottom:10px;
+    font-size:36px;
+    margin-bottom:8px;
 }
 
 .hero h1 span{
@@ -69,22 +75,21 @@ body{
 
 .hero p{
     color:#667085;
-    font-size:17px;
 }
 
 .card{
-    max-width:520px;
+    max-width:540px;
     margin:auto;
-    background:white;
-    border-radius:18px;
+    background:#fff;
     padding:30px;
+    border-radius:18px;
     box-shadow:0 10px 35px rgba(20,40,80,.08);
 }
 
 .tabs{
     display:flex;
     gap:8px;
-    margin-bottom:25px;
+    margin-bottom:22px;
 }
 
 .tab{
@@ -99,8 +104,7 @@ body{
 
 .tab.active{
     background:#2563eb;
-    color:white;
-    border-color:#2563eb;
+    color:#fff;
 }
 
 .form{
@@ -115,44 +119,58 @@ label{
     display:block;
     font-size:14px;
     font-weight:600;
-    margin:15px 0 7px;
+    margin:14px 0 7px;
 }
 
-input,select{
+input,select,textarea{
     width:100%;
-    padding:13px;
+    padding:12px;
     border:1px solid #d7dce5;
-    border-radius:9px;
+    border-radius:8px;
     outline:none;
     font-size:15px;
+    background:#fff;
 }
 
-input:focus,select:focus{
+textarea{
+    min-height:80px;
+    resize:vertical;
+}
+
+input:focus,select:focus,textarea:focus{
     border-color:#2563eb;
 }
 
-button.primary{
+.primary{
     width:100%;
-    margin-top:22px;
-    padding:14px;
+    margin-top:20px;
+    padding:13px;
     border:0;
     border-radius:9px;
     background:#2563eb;
-    color:white;
+    color:#fff;
     font-size:16px;
     font-weight:700;
     cursor:pointer;
 }
 
-button.primary:hover{
+.primary:hover{
     background:#1d4ed8;
+}
+
+.secondary{
+    padding:11px 15px;
+    border:1px solid #d7dce5;
+    border-radius:8px;
+    background:#fff;
+    cursor:pointer;
 }
 
 .message{
     display:none;
     padding:12px;
     border-radius:8px;
-    margin-top:15px;
+    margin-top:14px;
     font-size:14px;
 }
 
@@ -168,33 +186,45 @@ button.primary:hover{
     color:#b42318;
 }
 
+
+/* DASHBOARD */
+
 .dashboard{
     display:none;
 }
 
-.dashboard-card{
-    background:white;
-    border-radius:16px;
-    padding:30px;
-    box-shadow:0 10px 30px rgba(20,40,80,.07);
+.dashboard-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:22px;
 }
 
-.dashboard-grid{
+.dashboard-top h1{
+    font-size:28px;
+}
+
+.business-name{
+    color:#667085;
+    margin-top:5px;
+}
+
+.stats{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:18px;
-    margin-top:25px;
+    gap:16px;
 }
 
 .stat{
+    background:#fff;
     padding:22px;
-    background:#f7f9fc;
-    border-radius:12px;
+    border-radius:14px;
+    box-shadow:0 5px 20px rgba(20,40,80,.06);
 }
 
 .stat h3{
-    font-size:14px;
     color:#667085;
+    font-size:14px;
 }
 
 .stat p{
@@ -203,36 +233,188 @@ button.primary:hover{
     margin-top:8px;
 }
 
-.logout{
-    float:right;
-    padding:10px 16px;
-    border:1px solid #ddd;
-    background:white;
-    border-radius:8px;
+.free-box{
+    margin-top:18px;
+    background:#fff;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 5px 20px rgba(20,40,80,.06);
+}
+
+.free-number{
+    font-size:22px;
+    font-weight:800;
+    margin-top:7px;
+}
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-top:20px;
+}
+
+.menu-btn{
+    background:#fff;
+    border:1px solid #e1e6ee;
+    border-radius:13px;
+    padding:22px 10px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:15px;
+}
+
+.menu-btn:hover{
+    border-color:#2563eb;
+    transform:translateY(-1px);
+}
+
+#newBillSection{
+    display:none;
+    margin-top:25px;
+    background:#fff;
+    padding:25px;
+    border-radius:16px;
+    box-shadow:0 5px 25px rgba(20,40,80,.07);
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.bill-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.items-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:25px;
+    margin-bottom:10px;
+}
+
+.item-row{
+    border:1px solid #e1e6ee;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:12px;
+    background:#fafbfc;
+}
+
+.item-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr .7fr .9fr .7fr;
+    gap:8px;
+    align-items:end;
+}
+
+.remove-item{
+    border:0;
+    background:#fee4e2;
+    color:#b42318;
+    padding:10px;
+    border-radius:7px;
     cursor:pointer;
 }
 
-.loading{
-    text-align:center;
-    padding:20px;
-    color:#667085;
+.totals{
+    max-width:380px;
+    margin:20px 0 0 auto;
+    border-top:1px solid #ddd;
+    padding-top:15px;
 }
 
-@media(max-width:700px){
-    .hero h1{
-        font-size:30px;
-    }
+.total-line{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+}
 
-    .dashboard-grid{
+.grand-total{
+    font-size:22px;
+    font-weight:800;
+    border-top:1px solid #ddd;
+    margin-top:8px;
+    padding-top:10px;
+}
+
+.bill-actions{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.bill-actions button{
+    flex:1;
+}
+
+.hidden{
+    display:none;
+}
+
+@media(max-width:800px){
+
+    .stats{
         grid-template-columns:1fr;
     }
 
+    .menu-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .bill-grid{
+        grid-template-columns:1fr;
+    }
+
+    .item-grid{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:520px){
+
     .header{
-        padding:15px 20px;
+        padding:14px 15px;
+    }
+
+    .logo{
+        font-size:18px;
     }
 
     .container{
-        margin:25px auto;
+        padding:12px;
+        margin:20px auto;
+    }
+
+    .hero h1{
+        font-size:28px;
+    }
+
+    .card{
+        padding:20px;
+    }
+
+    .dashboard-top{
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    .dashboard-top h1{
+        font-size:23px;
+    }
+
+    .item-grid{
+        grid-template-columns:1fr;
+    }
+
+    .bill-actions{
+        flex-direction:column;
     }
 }
 </style>
@@ -241,161 +423,555 @@ button.primary:hover{
 <body>
 
 <header class="header">
-    <div class="logo">RP <span>Invoice Billing</span></div>
-    <button class="lang" onclick="toggleLanguage()">हिंदी / English</button>
+
+    <div class="logo">
+        RP <span>Invoice Billing</span>
+    </div>
+
+    <div class="header-right">
+
+        <button class="lang" onclick="toggleLanguage()">
+            हिंदी / English
+        </button>
+
+        <button class="logout" id="headerLogout"
+                onclick="logoutAdmin()"
+                style="display:none;">
+            Logout
+        </button>
+
+    </div>
+
 </header>
+
 
 <main class="container">
 
-    <section id="authSection">
 
-        <div class="hero">
-            <h1>Smart <span>Billing</span> for Every Business</h1>
-            <p id="heroText">
-                अपने व्यवसाय के लिए आसान और professional billing system
-            </p>
-        </div>
+<!-- ================= AUTH ================= -->
 
-        <div class="card">
+<section id="authSection">
 
-            <div class="tabs">
-                <button class="tab active" id="loginTab" onclick="showForm('login')">
-                    Login
-                </button>
+    <div class="hero">
 
-                <button class="tab" id="registerTab" onclick="showForm('register')">
-                    Admin Registration
-                </button>
-            </div>
+        <h1>
+            Smart <span>Billing</span> for Every Business
+        </h1>
 
-            <!-- LOGIN -->
+        <p id="heroText">
+            अपने व्यवसाय के लिए आसान और professional billing system
+        </p>
 
-            <div class="form active" id="loginForm">
-
-                <label>Email / ईमेल</label>
-                <input type="email" id="loginEmail" placeholder="Enter your email">
-
-                <label>Password / पासवर्ड</label>
-                <input type="password" id="loginPassword" placeholder="Enter password">
-
-                <button class="primary" onclick="loginAdmin()">
-                    Login / लॉगिन
-                </button>
-
-                <div id="loginMessage" class="message"></div>
-
-            </div>
+    </div>
 
 
-            <!-- REGISTRATION -->
+    <div class="card">
 
-            <div class="form" id="registerForm">
+        <div class="tabs">
 
-                <label>Admin Name / एडमिन का नाम</label>
-                <input type="text" id="regName" placeholder="Your full name">
-
-                <label>Mobile / मोबाइल</label>
-                <input type="tel" id="regMobile" placeholder="10 digit mobile number">
-
-                <label>Email / ईमेल</label>
-                <input type="email" id="regEmail" placeholder="Your email">
-
-                <label>Password / पासवर्ड</label>
-                <input type="password" id="regPassword" placeholder="Minimum 6 characters">
-
-                <label>Business Name / व्यवसाय का नाम</label>
-                <input type="text" id="businessName" placeholder="Example: RP Cyber Cafe">
-
-                <label>Business Type / व्यवसाय का प्रकार</label>
-                <select id="businessType">
-                    <option value="">Select Business Type</option>
-                </select>
-
-                <button class="primary" onclick="registerAdmin()">
-                    Create Admin Account
-                </button>
-
-                <div id="registerMessage" class="message"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- DASHBOARD -->
-
-    <section id="dashboardSection" class="dashboard">
-
-        <div class="dashboard-card">
-
-            <button class="logout" onclick="logoutAdmin()">
-                Logout
+            <button class="tab active"
+                    id="loginTab"
+                    onclick="showForm('login')">
+                Login
             </button>
 
-            <h1>Welcome, <span id="adminName">Admin</span> 👋</h1>
+            <button class="tab"
+                    id="registerTab"
+                    onclick="showForm('register')">
+                Admin Registration
+            </button>
 
-            <p style="margin-top:8px;color:#667085;">
-                RP Invoice Billing Dashboard
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <div class="form active" id="loginForm">
+
+            <label>Email / ईमेल</label>
+
+            <input type="email"
+                   id="loginEmail"
+                   placeholder="Enter your email">
+
+
+            <label>Password / पासवर्ड</label>
+
+            <input type="password"
+                   id="loginPassword"
+                   placeholder="Enter password">
+
+
+            <button class="primary"
+                    onclick="loginAdmin()">
+                Login / लॉगिन
+            </button>
+
+            <div id="loginMessage"
+                 class="message"></div>
+
+        </div>
+
+
+        <!-- REGISTER -->
+
+        <div class="form" id="registerForm">
+
+            <label>Admin Name / एडमिन का नाम</label>
+
+            <input type="text"
+                   id="regName"
+                   placeholder="Your full name">
+
+
+            <label>Mobile / मोबाइल</label>
+
+            <input type="tel"
+                   id="regMobile"
+                   placeholder="10 digit mobile number">
+
+
+            <label>Email / ईमेल</label>
+
+            <input type="email"
+                   id="regEmail"
+                   placeholder="Your email">
+
+
+            <label>Password / पासवर्ड</label>
+
+            <input type="password"
+                   id="regPassword"
+                   placeholder="Minimum 6 characters">
+
+
+            <label>Business Name / व्यवसाय का नाम</label>
+
+            <input type="text"
+                   id="businessName"
+                   placeholder="Example: RP Cyber Cafe">
+
+
+            <label>Business Type / व्यवसाय का प्रकार</label>
+
+            <select id="businessType">
+
+                <option value="">
+                    Select Business Type
+                </option>
+
+            </select>
+
+
+            <button class="primary"
+                    onclick="registerAdmin()">
+                Create Admin Account
+            </button>
+
+
+            <div id="registerMessage"
+                 class="message"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboardSection"
+         class="dashboard">
+
+
+    <div class="dashboard-top">
+
+        <div>
+
+            <h1>
+                Welcome,
+                <span id="adminName">Admin</span> 👋
+            </h1>
+
+            <p class="business-name"
+               id="businessTitle">
+                Your Business
             </p>
 
-            <div class="dashboard-grid">
+        </div>
 
-                <div class="stat">
-                    <h3>Today's Sales</h3>
-                    <p>₹0</p>
-                </div>
+    </div>
 
-                <div class="stat">
-                    <h3>Total Bills</h3>
-                    <p>0</p>
-                </div>
 
-                <div class="stat">
-                    <h3>Pending Amount</h3>
-                    <p>₹0</p>
-                </div>
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <h3>Today's Sales</h3>
+
+            <p id="todaySales">
+                ₹0
+            </p>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h3>Total Bills</h3>
+
+            <p id="totalBills">
+                0
+            </p>
+
+        </div>
+
+
+        <div class="stat">
+
+            <h3>Pending Amount</h3>
+
+            <p id="pendingAmount">
+                ₹0
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- FREE BILL -->
+
+    <div class="free-box">
+
+        <h3>
+            Free Bills / फ्री बिल
+        </h3>
+
+        <div class="free-number"
+             id="freeBillText">
+            0 / 3 Used
+        </div>
+
+        <p style="color:#667085;margin-top:5px;">
+            पहले 3 bills free हैं। उसके बाद subscription required होगा।
+        </p>
+
+    </div>
+
+
+    <!-- MENU -->
+
+    <div class="menu-grid">
+
+        <button class="menu-btn"
+                onclick="openNewBill()">
+            🧾<br>
+            New Bill
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="openNewBill()">
+            ⚡<br>
+            Quick Bill
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Customers')">
+            👥<br>
+            Customers
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Products')">
+            📦<br>
+            Products
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Services')">
+            🛠️<br>
+            Services
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Bill History')">
+            📋<br>
+            Bill History
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Reports')">
+            📊<br>
+            Reports
+        </button>
+
+
+        <button class="menu-btn"
+                onclick="comingSoon('Settings')">
+            ⚙️<br>
+            Business Settings
+        </button>
+
+    </div>
+
+
+
+    <!-- ================= NEW BILL ================= -->
+
+    <section id="newBillSection">
+
+        <div class="section-title">
+
+            <h2>
+                🧾 New Bill
+            </h2>
+
+            <button class="secondary"
+                    onclick="closeNewBill()">
+                Close
+            </button>
+
+        </div>
+
+
+        <!-- CUSTOMER -->
+
+        <h3>Customer Details / ग्राहक विवरण</h3>
+
+        <div class="bill-grid">
+
+            <div>
+
+                <label>Customer Name</label>
+
+                <input type="text"
+                       id="customerName"
+                       placeholder="Customer name">
 
             </div>
 
-            <div style="margin-top:30px;padding:20px;background:#f7f9fc;border-radius:12px;">
-                <h2 id="businessTitle">Your Business</h2>
-                <p id="businessInfo" style="margin-top:8px;color:#667085;">
-                    Business information loading...
-                </p>
+
+            <div>
+
+                <label>Mobile</label>
+
+                <input type="tel"
+                       id="customerMobile"
+                       placeholder="Mobile number">
+
+            </div>
+
+
+            <div>
+
+                <label>Address</label>
+
+                <input type="text"
+                       id="customerAddress"
+                       placeholder="Customer address">
+
+            </div>
+
+
+            <div>
+
+                <label>GSTIN (Optional)</label>
+
+                <input type="text"
+                       id="customerGstin"
+                       placeholder="GSTIN">
+
             </div>
 
         </div>
 
+
+        <!-- ITEMS -->
+
+        <div class="items-header">
+
+            <h3>
+                Products / Services
+            </h3>
+
+            <button class="secondary"
+                    onclick="addItem()">
+                + Add Item
+            </button>
+
+        </div>
+
+
+        <div id="itemsContainer"></div>
+
+
+        <!-- TOTALS -->
+
+        <div class="totals">
+
+            <div class="total-line">
+
+                <span>Subtotal</span>
+
+                <strong id="subtotal">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+
+            <div class="total-line">
+
+                <span>Discount</span>
+
+                <strong id="discountTotal">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+
+            <div class="total-line">
+
+                <span>GST</span>
+
+                <strong id="gstTotal">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+
+            <div class="total-line grand-total">
+
+                <span>Grand Total</span>
+
+                <strong id="grandTotal">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT -->
+
+        <div class="bill-grid"
+             style="margin-top:20px;">
+
+            <div>
+
+                <label>Payment Mode</label>
+
+                <select id="paymentMode">
+
+                    <option value="cash">
+                        Cash
+                    </option>
+
+                    <option value="upi">
+                        UPI
+                    </option>
+
+                    <option value="card">
+                        Card
+                    </option>
+
+                    <option value="bank">
+                        Bank
+                    </option>
+
+                    <option value="other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Paid Amount</label>
+
+                <input type="number"
+                       id="paidAmount"
+                       value="0"
+                       min="0"
+                       step="0.01"
+                       oninput="calculateBill()">
+
+            </div>
+
+        </div>
+
+
+        <label>Notes / टिप्पणी</label>
+
+        <textarea id="billNotes"
+                  placeholder="Optional notes"></textarea>
+
+
+        <div class="bill-actions">
+
+            <button class="primary"
+                    onclick="saveBill()">
+                Save Bill
+            </button>
+
+            <button class="secondary"
+                    onclick="clearBillForm()">
+                Clear
+            </button>
+
+        </div>
+
+
+        <div id="billMessage"
+             class="message"></div>
+
     </section>
+
+</section>
 
 </main>
 
 
+
 <script>
 
-/* ==============================
-   SUPABASE CONFIGURATION
-   ============================== */
+/* =========================================
+   SUPABASE
+   ========================================= */
 
-const SUPABASE_URL = "https://tidyegzbuxrpnpfrdjgu.supabase.co";
+const SUPABASE_URL =
+"https://tidyegzbuxrpnpfrdjgu.supabase.co";
 
 const SUPABASE_KEY =
 "sb_publishable_0h8WR657IRRpq05metJGvg_8FS4JsKY";
 
-const { createClient } =
-supabase;
-
-const db = createClient(
+const db =
+supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
 
-/* ==============================
+/* =========================================
    LANGUAGE
-   ============================== */
+   ========================================= */
 
 let hindi = true;
 
@@ -410,105 +986,137 @@ function toggleLanguage(){
 }
 
 
-/* ==============================
-   FORM SWITCH
-   ============================== */
+/* =========================================
+   FORM
+   ========================================= */
 
 function showForm(type){
 
-    document.getElementById("loginForm").classList.remove("active");
-    document.getElementById("registerForm").classList.remove("active");
+    document.getElementById("loginForm")
+        .classList.remove("active");
 
-    document.getElementById("loginTab").classList.remove("active");
-    document.getElementById("registerTab").classList.remove("active");
+    document.getElementById("registerForm")
+        .classList.remove("active");
+
+    document.getElementById("loginTab")
+        .classList.remove("active");
+
+    document.getElementById("registerTab")
+        .classList.remove("active");
+
 
     if(type === "login"){
 
-        document.getElementById("loginForm").classList.add("active");
-        document.getElementById("loginTab").classList.add("active");
+        document.getElementById("loginForm")
+            .classList.add("active");
+
+        document.getElementById("loginTab")
+            .classList.add("active");
 
     }else{
 
-        document.getElementById("registerForm").classList.add("active");
-        document.getElementById("registerTab").classList.add("active");
+        document.getElementById("registerForm")
+            .classList.add("active");
+
+        document.getElementById("registerTab")
+            .classList.add("active");
 
     }
 }
 
 
-/* ==============================
-   LOAD BUSINESS TYPES
-   ============================== */
+/* =========================================
+   BUSINESS TYPES
+   ========================================= */
 
 async function loadBusinessTypes(){
 
-    const { data, error } =
+    const select =
+        document.getElementById("businessType");
+
+    const { data,error } =
         await db
         .from("business_types")
         .select("id,name_en,name_hi")
         .eq("active",true)
         .order("id");
 
-    const select =
-        document.getElementById("businessType");
 
     if(error){
 
         console.error(error);
-        return;
 
+        return;
     }
+
+
+    select.innerHTML =
+        '<option value="">Select Business Type</option>';
+
 
     data.forEach(item => {
 
         const option =
-        document.createElement("option");
+            document.createElement("option");
 
-        option.value = item.id;
+        option.value =
+            item.id;
 
         option.textContent =
-            item.name_hi + " / " + item.name_en;
+            item.name_hi +
+            " / " +
+            item.name_en;
 
         select.appendChild(option);
 
     });
+
 }
 
 
-/* ==============================
-   REGISTER ADMIN
-   ============================== */
+/* =========================================
+   REGISTER
+   ========================================= */
 
 async function registerAdmin(){
 
     const name =
-        document.getElementById("regName").value.trim();
+        document.getElementById("regName")
+        .value.trim();
 
     const mobile =
-        document.getElementById("regMobile").value.trim();
+        document.getElementById("regMobile")
+        .value.trim();
 
     const email =
-        document.getElementById("regEmail").value.trim();
+        document.getElementById("regEmail")
+        .value.trim();
 
     const password =
-        document.getElementById("regPassword").value;
+        document.getElementById("regPassword")
+        .value;
 
     const businessName =
-        document.getElementById("businessName").value.trim();
+        document.getElementById("businessName")
+        .value.trim();
 
     const businessType =
-        document.getElementById("businessType").value;
+        document.getElementById("businessType")
+        .value;
 
     const message =
         document.getElementById("registerMessage");
 
 
     message.className = "message";
-    message.style.display = "none";
 
 
-    if(!name || !mobile || !email ||
-       !password || !businessName || !businessType){
+    if(!name ||
+       !mobile ||
+       !email ||
+       !password ||
+       !businessName ||
+       !businessType){
 
         message.innerText =
             "कृपया सभी जानकारी भरें।";
@@ -539,7 +1147,7 @@ async function registerAdmin(){
         "message success";
 
 
-    const { data, error } =
+    const { data,error } =
         await db.auth.signUp({
 
             email:email,
@@ -571,7 +1179,7 @@ async function registerAdmin(){
     if(!data.user){
 
         message.innerText =
-            "Registration complete. कृपया email verification पूरा करें और फिर Login करें।";
+            "Registration complete. Email verification required.";
 
         message.className =
             "message success";
@@ -580,13 +1188,7 @@ async function registerAdmin(){
     }
 
 
-    /*
-       Profile automatically created by
-       Supabase trigger.
-    */
-
-
-    const { error: businessError } =
+    const { error:businessError } =
         await db
         .from("businesses")
         .insert({
@@ -611,7 +1213,7 @@ async function registerAdmin(){
         console.error(businessError);
 
         message.innerText =
-            "Admin account बन गया है, लेकिन business setup में समस्या आई।";
+            "Admin account बन गया लेकिन Business setup में समस्या आई।";
 
         message.className =
             "message error";
@@ -627,33 +1229,30 @@ async function registerAdmin(){
         "message success";
 
 
-    setTimeout(() => {
-
-        showDashboard();
-
-    },1000);
+    setTimeout(
+        showDashboard,
+        700
+    );
 
 }
 
 
-/* ==============================
+/* =========================================
    LOGIN
-   ============================== */
+   ========================================= */
 
 async function loginAdmin(){
 
     const email =
-        document.getElementById("loginEmail").value.trim();
+        document.getElementById("loginEmail")
+        .value.trim();
 
     const password =
-        document.getElementById("loginPassword").value;
+        document.getElementById("loginPassword")
+        .value;
 
     const message =
         document.getElementById("loginMessage");
-
-
-    message.className = "message";
-    message.style.display = "none";
 
 
     if(!email || !password){
@@ -675,7 +1274,7 @@ async function loginAdmin(){
         "message success";
 
 
-    const { data,error } =
+    const { error } =
         await db.auth.signInWithPassword({
 
             email:email,
@@ -702,16 +1301,14 @@ async function loginAdmin(){
 }
 
 
-/* ==============================
+/* =========================================
    DASHBOARD
-   ============================== */
+   ========================================= */
 
 async function showDashboard(){
 
     const {
-        data:{
-            user
-        }
+        data:{user}
     } =
         await db.auth.getUser();
 
@@ -727,11 +1324,14 @@ async function showDashboard(){
     document.getElementById("dashboardSection")
         .style.display = "block";
 
+    document.getElementById("headerLogout")
+        .style.display = "block";
+
 
     const { data:profile } =
         await db
         .from("profiles")
-        .select("full_name")
+        .select("full_name,role")
         .eq("id",user.id)
         .single();
 
@@ -740,7 +1340,8 @@ async function showDashboard(){
 
         document.getElementById("adminName")
             .innerText =
-            profile.full_name || "Admin";
+            profile.full_name ||
+            "Admin";
 
     }
 
@@ -760,20 +1361,838 @@ async function showDashboard(){
             .innerText =
             business.business_name;
 
-        document.getElementById("businessInfo")
-            .innerText =
-            (business.owner_name || "") +
-            " • " +
-            (business.mobile || "");
-
     }
+
+
+    await loadDashboardStats(user.id);
 
 }
 
 
-/* ==============================
+/* =========================================
+   DASHBOARD STATS
+   ========================================= */
+
+async function loadDashboardStats(adminId){
+
+    const { data:bills,error } =
+        await db
+        .from("bills")
+        .select("grand_total,paid_amount,due_amount,created_at");
+
+
+    if(error){
+
+        console.error(error);
+
+        return;
+    }
+
+
+    const adminBills =
+        (bills || []).filter(
+            bill => true
+        );
+
+
+    /*
+       RLS automatically ensures that
+       normal admin receives only own bills.
+    */
+
+
+    let totalSales = 0;
+    let pending = 0;
+
+
+    const today =
+        new Date().toISOString().slice(0,10);
+
+
+    let todaySales = 0;
+
+
+    adminBills.forEach(bill => {
+
+        totalSales +=
+            Number(bill.grand_total || 0);
+
+        pending +=
+            Number(bill.due_amount || 0);
+
+
+        if(
+            bill.created_at &&
+            bill.created_at.slice(0,10) === today
+        ){
+
+            todaySales +=
+                Number(bill.grand_total || 0);
+
+        }
+
+    });
+
+
+    document.getElementById("totalBills")
+        .innerText =
+        adminBills.length;
+
+
+    document.getElementById("todaySales")
+        .innerText =
+        "₹" +
+        todaySales.toFixed(2);
+
+
+    document.getElementById("pendingAmount")
+        .innerText =
+        "₹" +
+        pending.toFixed(2);
+
+
+    document.getElementById("freeBillText")
+        .innerText =
+        Math.min(adminBills.length,3) +
+        " / 3 Used";
+
+}
+
+
+/* =========================================
+   NEW BILL
+   ========================================= */
+
+function openNewBill(){
+
+    document.getElementById("newBillSection")
+        .style.display = "block";
+
+    if(
+        document.getElementById("itemsContainer")
+        .children.length === 0
+    ){
+
+        addItem();
+
+    }
+
+
+    document.getElementById("newBillSection")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+function closeNewBill(){
+
+    document.getElementById("newBillSection")
+        .style.display = "none";
+
+}
+
+
+/* =========================================
+   ADD ITEM
+   ========================================= */
+
+function addItem(){
+
+    const container =
+        document.getElementById("itemsContainer");
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "item-row";
+
+
+    row.innerHTML = `
+
+        <div class="item-grid">
+
+            <div>
+
+                <label>Type</label>
+
+                <select class="item-type">
+
+                    <option value="product">
+                        Product
+                    </option>
+
+                    <option value="service">
+                        Service
+                    </option>
+
+                    <option value="custom">
+                        Custom
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Name</label>
+
+                <input
+                    type="text"
+                    class="item-name"
+                    placeholder="Item / Service">
+
+            </div>
+
+
+            <div>
+
+                <label>Qty</label>
+
+                <input
+                    type="number"
+                    class="item-qty"
+                    value="1"
+                    min="0"
+                    step="0.01"
+                    oninput="calculateBill()">
+
+            </div>
+
+
+            <div>
+
+                <label>Rate</label>
+
+                <input
+                    type="number"
+                    class="item-rate"
+                    value="0"
+                    min="0"
+                    step="0.01"
+                    oninput="calculateBill()">
+
+            </div>
+
+
+            <div>
+
+                <label>GST %</label>
+
+                <input
+                    type="number"
+                    class="item-gst"
+                    value="0"
+                    min="0"
+                    step="0.01"
+                    oninput="calculateBill()">
+
+            </div>
+
+        </div>
+
+
+        <div style="margin-top:10px;display:flex;gap:10px;">
+
+            <input
+                type="number"
+                class="item-discount"
+                value="0"
+                min="0"
+                step="0.01"
+                placeholder="Discount ₹"
+                oninput="calculateBill()">
+
+            <button
+                class="remove-item"
+                onclick="removeItem(this)">
+                Remove
+            </button>
+
+        </div>
+    `;
+
+
+    container.appendChild(row);
+
+    calculateBill();
+
+}
+
+
+function removeItem(button){
+
+    button
+        .closest(".item-row")
+        .remove();
+
+    calculateBill();
+
+}
+
+
+/* =========================================
+   CALCULATE BILL
+   ========================================= */
+
+function calculateBill(){
+
+    const rows =
+        document.querySelectorAll(".item-row");
+
+
+    let subtotal = 0;
+    let discount = 0;
+    let gst = 0;
+
+
+    rows.forEach(row => {
+
+        const qty =
+            Number(
+                row.querySelector(".item-qty")
+                .value
+            ) || 0;
+
+
+        const rate =
+            Number(
+                row.querySelector(".item-rate")
+                .value
+            ) || 0;
+
+
+        const disc =
+            Number(
+                row.querySelector(".item-discount")
+                .value
+            ) || 0;
+
+
+        const gstPercent =
+            Number(
+                row.querySelector(".item-gst")
+                .value
+            ) || 0;
+
+
+        const line =
+            qty * rate;
+
+
+        const taxable =
+            Math.max(
+                0,
+                line - disc
+            );
+
+
+        const gstAmount =
+            taxable *
+            gstPercent /
+            100;
+
+
+        subtotal += line;
+        discount += disc;
+        gst += gstAmount;
+
+    });
+
+
+    const grand =
+        subtotal -
+        discount +
+        gst;
+
+
+    document.getElementById("subtotal")
+        .innerText =
+        "₹" + subtotal.toFixed(2);
+
+
+    document.getElementById("discountTotal")
+        .innerText =
+        "₹" + discount.toFixed(2);
+
+
+    document.getElementById("gstTotal")
+        .innerText =
+        "₹" + gst.toFixed(2);
+
+
+    document.getElementById("grandTotal")
+        .innerText =
+        "₹" + grand.toFixed(2);
+
+
+    return {
+        subtotal,
+        discount,
+        gst,
+        grand
+    };
+
+}
+
+
+/* =========================================
+   SAVE BILL
+   ========================================= */
+
+async function saveBill(){
+
+    const {
+        data:{user}
+    } =
+        await db.auth.getUser();
+
+
+    if(!user){
+
+        alert("Please login first.");
+
+        return;
+    }
+
+
+    /* FREE BILL LIMIT */
+
+    const { data:existingBills,error:countError } =
+        await db
+        .from("bills")
+        .select("id");
+
+
+    if(countError){
+
+        alert(countError.message);
+
+        return;
+    }
+
+
+    if(existingBills.length >= 3){
+
+        alert(
+            "आपके 3 Free Bills पूरे हो चुके हैं। आगे billing के लिए subscription required होगा।"
+        );
+
+        return;
+    }
+
+
+    const customerName =
+        document.getElementById("customerName")
+        .value.trim();
+
+
+    const customerMobile =
+        document.getElementById("customerMobile")
+        .value.trim();
+
+
+    const customerAddress =
+        document.getElementById("customerAddress")
+        .value.trim();
+
+
+    const customerGstin =
+        document.getElementById("customerGstin")
+        .value.trim();
+
+
+    const notes =
+        document.getElementById("billNotes")
+        .value.trim();
+
+
+    const paymentMode =
+        document.getElementById("paymentMode")
+        .value;
+
+
+    const paidAmount =
+        Number(
+            document.getElementById("paidAmount")
+            .value
+        ) || 0;
+
+
+    const calculation =
+        calculateBill();
+
+
+    if(calculation.grand <= 0){
+
+        alert(
+            "कृपया कम से कम एक item और उसकी rate भरें।"
+        );
+
+        return;
+    }
+
+
+    if(paidAmount > calculation.grand){
+
+        alert(
+            "Paid amount Grand Total से अधिक नहीं हो सकता।"
+        );
+
+        return;
+    }
+
+
+    let customerId = null;
+
+
+    /* SAVE CUSTOMER */
+
+    if(customerName || customerMobile){
+
+        const { data:customer,error:customerError } =
+            await db
+            .from("customers")
+            .insert({
+
+                admin_id:user.id,
+
+                name:
+                    customerName ||
+                    "Walk-in Customer",
+
+                mobile:
+                    customerMobile,
+
+                address:
+                    customerAddress,
+
+                gstin:
+                    customerGstin
+
+            })
+            .select("id")
+            .single();
+
+
+        if(customerError){
+
+            alert(
+                "Customer save error: " +
+                customerError.message
+            );
+
+            return;
+        }
+
+
+        customerId =
+            customer.id;
+
+    }
+
+
+    /* INVOICE NUMBER */
+
+    const invoiceNumber =
+        "INV-" +
+        Date.now();
+
+
+    const dueAmount =
+        Math.max(
+            0,
+            calculation.grand -
+            paidAmount
+        );
+
+
+    let paymentStatus =
+        "paid";
+
+
+    if(paidAmount <= 0){
+
+        paymentStatus = "due";
+
+    }else if(paidAmount < calculation.grand){
+
+        paymentStatus = "partial";
+
+    }
+
+
+    /* SAVE BILL */
+
+    const { data:bill,error:billError } =
+        await db
+        .from("bills")
+        .insert({
+
+            admin_id:user.id,
+
+            invoice_number:
+                invoiceNumber,
+
+            customer_id:
+                customerId,
+
+            customer_name:
+                customerName,
+
+            customer_mobile:
+                customerMobile,
+
+            customer_address:
+                customerAddress,
+
+            customer_gstin:
+                customerGstin,
+
+            subtotal:
+                calculation.subtotal,
+
+            discount:
+                calculation.discount,
+
+            tax:
+                calculation.gst,
+
+            grand_total:
+                calculation.grand,
+
+            paid_amount:
+                paidAmount,
+
+            due_amount:
+                dueAmount,
+
+            payment_status:
+                paymentStatus,
+
+            payment_mode:
+                paymentMode,
+
+            notes:
+                notes
+
+        })
+        .select("id")
+        .single();
+
+
+    if(billError){
+
+        alert(
+            "Bill save error: " +
+            billError.message
+        );
+
+        return;
+    }
+
+
+    /* SAVE BILL ITEMS */
+
+    const rows =
+        document.querySelectorAll(".item-row");
+
+
+    const billItems = [];
+
+
+    rows.forEach(row => {
+
+        const type =
+            row.querySelector(".item-type")
+            .value;
+
+        const name =
+            row.querySelector(".item-name")
+            .value.trim();
+
+        const qty =
+            Number(
+                row.querySelector(".item-qty")
+                .value
+            ) || 0;
+
+        const rate =
+            Number(
+                row.querySelector(".item-rate")
+                .value
+            ) || 0;
+
+        const disc =
+            Number(
+                row.querySelector(".item-discount")
+                .value
+            ) || 0;
+
+        const gstPercent =
+            Number(
+                row.querySelector(".item-gst")
+                .value
+            ) || 0;
+
+        const line =
+            qty * rate;
+
+        const taxable =
+            Math.max(
+                0,
+                line - disc
+            );
+
+        const gstAmount =
+            taxable *
+            gstPercent /
+            100;
+
+        const lineTotal =
+            taxable +
+            gstAmount;
+
+
+        billItems.push({
+
+            bill_id:
+                bill.id,
+
+            admin_id:
+                user.id,
+
+            item_type:
+                type,
+
+            item_name:
+                name || "Item",
+
+            quantity:
+                qty,
+
+            rate:
+                rate,
+
+            discount:
+                disc,
+
+            gst_percent:
+                gstPercent,
+
+            gst_amount:
+                gstAmount,
+
+            line_total:
+                lineTotal
+
+        });
+
+    });
+
+
+    const { error:itemError } =
+        await db
+        .from("bill_items")
+        .insert(billItems);
+
+
+    if(itemError){
+
+        alert(
+            "Bill items save error: " +
+            itemError.message
+        );
+
+        return;
+    }
+
+
+    const message =
+        document.getElementById("billMessage");
+
+
+    message.innerText =
+        "✅ Bill " +
+        invoiceNumber +
+        " successfully saved!";
+
+    message.className =
+        "message success";
+
+
+    await loadDashboardStats(user.id);
+
+
+    setTimeout(() => {
+
+        clearBillForm();
+
+    },700);
+
+}
+
+
+/* =========================================
+   CLEAR BILL
+   ========================================= */
+
+function clearBillForm(){
+
+    document.getElementById("customerName")
+        .value = "";
+
+    document.getElementById("customerMobile")
+        .value = "";
+
+    document.getElementById("customerAddress")
+        .value = "";
+
+    document.getElementById("customerGstin")
+        .value = "";
+
+    document.getElementById("billNotes")
+        .value = "";
+
+    document.getElementById("paidAmount")
+        .value = "0";
+
+
+    document.getElementById("itemsContainer")
+        .innerHTML = "";
+
+
+    document.getElementById("billMessage")
+        .className = "message";
+
+
+    addItem();
+
+}
+
+
+/* =========================================
+   COMING SOON
+   ========================================= */
+
+function comingSoon(name){
+
+    alert(
+        name +
+        " module अगले चरण में बनाया जाएगा।"
+    );
+
+}
+
+
+/* =========================================
    LOGOUT
-   ============================== */
+   ========================================= */
 
 async function logoutAdmin(){
 
@@ -785,21 +2204,22 @@ async function logoutAdmin(){
     document.getElementById("authSection")
         .style.display = "block";
 
+    document.getElementById("headerLogout")
+        .style.display = "none";
+
     showForm("login");
 
 }
 
 
-/* ==============================
-   CHECK EXISTING SESSION
-   ============================== */
+/* =========================================
+   SESSION
+   ========================================= */
 
 async function checkSession(){
 
     const {
-        data:{
-            session
-        }
+        data:{session}
     } =
         await db.auth.getSession();
 
@@ -813,15 +2233,20 @@ async function checkSession(){
 }
 
 
-/* ==============================
+/* =========================================
    START
-   ============================== */
+   ========================================= */
 
-document.addEventListener("DOMContentLoaded", function(){
-    loadBusinessTypes();
-});
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
 
-checkSession();
+        loadBusinessTypes();
+
+        checkSession();
+
+    }
+);
 
 </script>
 
