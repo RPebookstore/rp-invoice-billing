@@ -2209,6 +2209,7 @@ async function viewBill(billId){
         .from("bills")
         .select(`
             id,
+            admin_id,
             invoice_number,
             customer_name,
             customer_mobile,
