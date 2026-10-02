@@ -1048,26 +1048,6 @@ async function loadBusinessTypes(){
 
         return;
     }
-const {
-    data: business,
-    error: businessError
-} = await db
-    .from("businesses")
-    .select(`
-        business_name,
-        business_type,
-        owner_name,
-        mobile,
-        email,
-        address,
-        city,
-        state,
-        pincode,
-        gstin,
-        logo_url
-    `)
-    .eq("admin_id", bill.admin_id || "")
-    .maybeSingle();
 
     select.innerHTML =
         '<option value="">Select Business Type</option>';
