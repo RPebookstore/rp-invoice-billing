@@ -2292,102 +2292,122 @@ async function loadBillHistory(){
 
     list.innerHTML = bills.map(bill => {
 
-        const date = new Date(
-            bill.created_at
-        ).toLocaleString("en-IN", {
-            dateStyle:"medium",
-            timeStyle:"short"
-        });
+    const date = new Date(
+        bill.created_at
+    ).toLocaleString("en-IN", {
+        dateStyle:"medium",
+        timeStyle:"short"
+    });
 
-        return `
+    return `
+        <div style="
+            border:1px solid #ddd;
+            border-radius:12px;
+            padding:15px;
+            margin-bottom:12px;
+            background:#fff;
+        ">
+
             <div style="
-                border:1px solid #ddd;
-                border-radius:12px;
-                padding:15px;
-                margin-bottom:12px;
-                background:#fff;
+                display:flex;
+                justify-content:space-between;
+                gap:10px;
+                flex-wrap:wrap;
             ">
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    gap:10px;
-                    flex-wrap:wrap;
-                ">
+                <div>
+                    <strong>
+                        ${bill.invoice_number}
+                    </strong>
 
-                    <div>
-                        <strong>
-                            ${bill.invoice_number}
-                        </strong>
-
-                        <div style="
-                            color:#666;
-                            margin-top:5px;
-                        ">
-                            ${bill.customer_name || "Walk-in Customer"}
-                        </div>
-
-                        ${
-                            bill.customer_mobile
-                            ? `<div style="color:#666;">
-                                📱 ${bill.customer_mobile}
-                              </div>`
-                            : ""
-                        }
+                    <div style="
+                        color:#666;
+                        margin-top:5px;
+                    ">
+                        ${bill.customer_name || "Walk-in Customer"}
                     </div>
 
-
-                    <div style="text-align:right;">
-
-                        <strong style="font-size:18px;">
-                            ₹${Number(bill.grand_total || 0).toFixed(2)}
-                        </strong>
-
-                        <div style="margin-top:5px;">
-                            ${bill.payment_status || "paid"}
-                        </div>
-
-                    </div>
-
+                    ${
+                        bill.customer_mobile
+                        ? `<div style="color:#666;">
+                            📱 ${bill.customer_mobile}
+                          </div>`
+                        : ""
+                    }
                 </div>
 
 
-                <div style="
-                    margin-top:12px;
-                    padding-top:10px;
-                    border-top:1px solid #eee;
-                    color:#555;
-                ">
+                <div style="text-align:right;">
 
-                    Paid:
-                    ₹${Number(bill.paid_amount || 0).toFixed(2)}
+                    <strong style="font-size:18px;">
+                        ₹${Number(bill.grand_total || 0).toFixed(2)}
+                    </strong>
 
-                    &nbsp; | &nbsp;
+                    <div style="margin-top:5px;">
+                        ${bill.payment_status || "paid"}
+                    </div>
 
-                    Due:
-                    ₹${Number(bill.due_amount || 0).toFixed(2)}
-
-                    &nbsp; | &nbsp;
-
-                    ${bill.payment_mode || "cash"}
-
-                </div>
-
-
-                <div style="
-                    margin-top:8px;
-                    font-size:13px;
-                    color:#888;
-                ">
-                    ${date}
                 </div>
 
             </div>
-        `;
 
-    }).join("");
+
+            <div style="
+                margin-top:12px;
+                padding-top:10px;
+                border-top:1px solid #eee;
+                color:#555;
+            ">
+
+                Paid:
+                ₹${Number(bill.paid_amount || 0).toFixed(2)}
+
+                &nbsp; | &nbsp;
+
+                Due:
+                ₹${Number(bill.due_amount || 0).toFixed(2)}
+
+                &nbsp; | &nbsp;
+
+                ${bill.payment_mode || "cash"}
+
+            </div>
+
+
+            <div style="
+                margin-top:8px;
+                font-size:13px;
+                color:#888;
+            ">
+                ${date}
+            </div>
+
+
+            <!-- VIEW BILL BUTTON -->
+
+            <div style="
+                margin-top:14px;
+                text-align:right;
+            ">
+
+                <button
+                    class="menu-btn"
+                    onclick="viewBill('${bill.id}')"
+                    style="
+                        padding:10px 18px;
+                        cursor:pointer;
+                    "
+                >
+                    👁️ View Bill
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+}).join("");
 }
-
 /* =========================================
    LOGOUT
    ========================================= */
