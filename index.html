@@ -2188,6 +2188,455 @@ function comingSoon(name){
     );
 
 }
+async function viewBill(billId){
+
+    const dashboard = document.getElementById("dashboardSection");
+
+    if(!dashboard){
+        alert("Dashboard section नहीं मिला।");
+        return;
+    }
+
+    dashboard.innerHTML = `
+        <div style="padding:20px;text-align:center;">
+            <p>Bill details loading...</p>
+        </div>
+    `;
+
+    const {
+        data: bill,
+        error
+    } = await db
+        .from("bills")
+        .select(`
+            id,
+            invoice_number,
+            customer_name,
+            customer_mobile,
+            customer_address,
+            customer_gstin,
+            subtotal,
+            discount,
+            tax,
+            grand_total,
+            paid_amount,
+            due_amount,
+            payment_status,
+            payment_mode,
+            notes,
+            created_at
+        `)
+        .eq("id", billId)
+        .single();
+
+
+    if(error){
+
+        console.error(error);
+
+        dashboard.innerHTML = `
+            <div style="padding:20px;">
+                <h3>❌ Bill load नहीं हो सका</h3>
+                <p>${error.message}</p>
+
+                <button
+                    class="menu-btn"
+                    onclick="openBillHistory()">
+                    ← Bill History
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const {
+        data: billItems,
+        error: itemsError
+    } = await db
+        .from("bill_items")
+        .select(`
+            item_name,
+            description,
+            quantity,
+            rate,
+            discount,
+            gst_percent,
+            gst_amount,
+            line_total
+        `)
+        .eq("bill_id", billId)
+        .order("created_at", {
+            ascending:true
+        });
+
+
+    if(itemsError){
+
+        console.error(itemsError);
+
+        dashboard.innerHTML = `
+            <div style="padding:20px;">
+                <h3>❌ Bill items load नहीं हो सके</h3>
+                <p>${itemsError.message}</p>
+
+                <button
+                    class="menu-btn"
+                    onclick="openBillHistory()">
+                    ← Bill History
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const date = new Date(
+        bill.created_at
+    ).toLocaleString("en-IN", {
+        dateStyle:"medium",
+        timeStyle:"short"
+    });
+
+
+    const itemsHTML = (billItems || []).map((item,index) => {
+
+        return `
+            <tr>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    ${index + 1}
+                </td>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;">
+                    <strong>${item.item_name}</strong>
+
+                    ${
+                        item.description
+                        ? `<div style="font-size:12px;color:#777;">
+                            ${item.description}
+                          </div>`
+                        : ""
+                    }
+                </td>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;text-align:center;">
+                    ${Number(item.quantity || 0)}
+                </td>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;">
+                    ₹${Number(item.rate || 0).toFixed(2)}
+                </td>
+
+                <td style="padding:10px;border-bottom:1px solid #eee;text-align:right;">
+                    ₹${Number(item.line_total || 0).toFixed(2)}
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+
+    dashboard.innerHTML = `
+
+        <div style="
+            max-width:850px;
+            margin:auto;
+        ">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:10px;
+                flex-wrap:wrap;
+                margin-bottom:20px;
+            ">
+
+                <h2>🧾 Bill Details</h2>
+
+                <button
+                    class="menu-btn"
+                    onclick="openBillHistory()">
+                    ← Bill History
+                </button>
+
+            </div>
+
+
+            <div style="
+                background:#fff;
+                border:1px solid #ddd;
+                border-radius:12px;
+                padding:25px;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:20px;
+                    flex-wrap:wrap;
+                    border-bottom:1px solid #ddd;
+                    padding-bottom:20px;
+                ">
+
+                    <div>
+
+                        <h2 style="margin:0;">
+                            Invoice
+                        </h2>
+
+                        <p style="margin:8px 0 0;">
+                            <strong>
+                                ${bill.invoice_number}
+                            </strong>
+                        </p>
+
+                        <p style="
+                            margin:5px 0 0;
+                            color:#666;
+                        ">
+                            ${date}
+                        </p>
+
+                    </div>
+
+
+                    <div style="text-align:right;">
+
+                        <strong style="font-size:22px;">
+                            ₹${Number(bill.grand_total || 0).toFixed(2)}
+                        </strong>
+
+                        <div style="margin-top:5px;">
+                            ${bill.payment_status || "paid"}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CUSTOMER -->
+
+                <div style="
+                    margin-top:20px;
+                    padding:15px;
+                    background:#f7f7f7;
+                    border-radius:8px;
+                ">
+
+                    <h3 style="margin-top:0;">
+                        Customer Details
+                    </h3>
+
+                    <p>
+                        <strong>Name:</strong>
+                        ${bill.customer_name || "Walk-in Customer"}
+                    </p>
+
+                    ${
+                        bill.customer_mobile
+                        ? `<p>
+                            <strong>Mobile:</strong>
+                            ${bill.customer_mobile}
+                          </p>`
+                        : ""
+                    }
+
+                    ${
+                        bill.customer_address
+                        ? `<p>
+                            <strong>Address:</strong>
+                            ${bill.customer_address}
+                          </p>`
+                        : ""
+                    }
+
+                    ${
+                        bill.customer_gstin
+                        ? `<p>
+                            <strong>GSTIN:</strong>
+                            ${bill.customer_gstin}
+                          </p>`
+                        : ""
+                    }
+
+                </div>
+
+
+                <!-- ITEMS -->
+
+                <div style="
+                    overflow-x:auto;
+                    margin-top:20px;
+                ">
+
+                    <table style="
+                        width:100%;
+                        border-collapse:collapse;
+                    ">
+
+                        <thead>
+
+                            <tr style="
+                                background:#f1f1f1;
+                            ">
+
+                                <th style="padding:10px;text-align:left;">
+                                    #
+                                </th>
+
+                                <th style="padding:10px;text-align:left;">
+                                    Item
+                                </th>
+
+                                <th style="padding:10px;text-align:center;">
+                                    Qty
+                                </th>
+
+                                <th style="padding:10px;text-align:right;">
+                                    Rate
+                                </th>
+
+                                <th style="padding:10px;text-align:right;">
+                                    Total
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            ${itemsHTML}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- TOTALS -->
+
+                <div style="
+                    margin-top:20px;
+                    margin-left:auto;
+                    max-width:320px;
+                ">
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:6px 0;
+                    ">
+                        <span>Subtotal</span>
+                        <strong>
+                            ₹${Number(bill.subtotal || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:6px 0;
+                    ">
+                        <span>Discount</span>
+                        <strong>
+                            ₹${Number(bill.discount || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:6px 0;
+                    ">
+                        <span>Tax</span>
+                        <strong>
+                            ₹${Number(bill.tax || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:10px 0;
+                        border-top:2px solid #333;
+                        font-size:18px;
+                    ">
+                        <span>Grand Total</span>
+                        <strong>
+                            ₹${Number(bill.grand_total || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:6px 0;
+                    ">
+                        <span>Paid</span>
+                        <strong>
+                            ₹${Number(bill.paid_amount || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        padding:6px 0;
+                    ">
+                        <span>Due</span>
+                        <strong>
+                            ₹${Number(bill.due_amount || 0).toFixed(2)}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                ${
+                    bill.notes
+                    ? `
+                        <div style="
+                            margin-top:20px;
+                            padding:15px;
+                            background:#fafafa;
+                            border-radius:8px;
+                        ">
+                            <strong>Notes:</strong>
+                            <div style="margin-top:5px;">
+                                ${bill.notes}
+                            </div>
+                        </div>
+                      `
+                    : ""
+                }
+
+
+                <div style="
+                    margin-top:25px;
+                    text-align:center;
+                ">
+
+                    <button
+                        class="menu-btn"
+                        onclick="openBillHistory()">
+                        ← Back to Bill History
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}    
 async function openBillHistory(){
 
     const dashboard = document.getElementById("dashboardSection");
