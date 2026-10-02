@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP Invoice Billing</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:#f4f7fb;
+    color:#172033;
+}
+
+.header{
+    background:#ffffff;
+    border-bottom:1px solid #e5e9f0;
+    padding:18px 6%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#2563eb;
+}
+
+.lang{
+    border:1px solid #d7dce5;
+    background:white;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.container{
+    max-width:1100px;
+    margin:45px auto;
+    padding:20px;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.hero h1{
+    font-size:38px;
+    margin-bottom:10px;
+}
+
+.hero h1 span{
+    color:#2563eb;
+}
+
+.hero p{
+    color:#667085;
+    font-size:17px;
+}
+
+.card{
+    max-width:520px;
+    margin:auto;
+    background:white;
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 10px 35px rgba(20,40,80,.08);
+}
+
+.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:25px;
+}
+
+.tab{
+    flex:1;
+    padding:12px;
+    border:1px solid #d9dee8;
+    background:#fff;
+    border-radius:9px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.tab.active{
+    background:#2563eb;
+    color:white;
+    border-color:#2563eb;
+}
+
+.form{
+    display:none;
+}
+
+.form.active{
+    display:block;
+}
+
+label{
+    display:block;
+    font-size:14px;
+    font-weight:600;
+    margin:15px 0 7px;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    border:1px solid #d7dce5;
+    border-radius:9px;
+    outline:none;
+    font-size:15px;
+}
+
+input:focus,select:focus{
+    border-color:#2563eb;
+}
+
+button.primary{
+    width:100%;
+    margin-top:22px;
+    padding:14px;
+    border:0;
+    border-radius:9px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+button.primary:hover{
+    background:#1d4ed8;
+}
+
+.message{
+    display:none;
+    padding:12px;
+    border-radius:8px;
+    margin-top:15px;
+    font-size:14px;
+}
+
+.success{
+    display:block;
+    background:#ecfdf3;
+    color:#067647;
+}
+
+.error{
+    display:block;
+    background:#fef3f2;
+    color:#b42318;
+}
+
+.dashboard{
+    display:none;
+}
+
+.dashboard-card{
+    background:white;
+    border-radius:16px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(20,40,80,.07);
+}
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-top:25px;
+}
+
+.stat{
+    padding:22px;
+    background:#f7f9fc;
+    border-radius:12px;
+}
+
+.stat h3{
+    font-size:14px;
+    color:#667085;
+}
+
+.stat p{
+    font-size:27px;
+    font-weight:800;
+    margin-top:8px;
+}
+
+.logout{
+    float:right;
+    padding:10px 16px;
+    border:1px solid #ddd;
+    background:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.loading{
+    text-align:center;
+    padding:20px;
+    color:#667085;
+}
+
+@media(max-width:700px){
+    .hero h1{
+        font-size:30px;
+    }
+
+    .dashboard-grid{
+        grid-template-columns:1fr;
+    }
+
+    .header{
+        padding:15px 20px;
+    }
+
+    .container{
+        margin:25px auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="logo">RP <span>Invoice Billing</span></div>
+    <button class="lang" onclick="toggleLanguage()">हिंदी / English</button>
+</header>
+
+<main class="container">
+
+    <section id="authSection">
+
+        <div class="hero">
+            <h1>Smart <span>Billing</span> for Every Business</h1>
+            <p id="heroText">
+                अपने व्यवसाय के लिए आसान और professional billing system
+            </p>
+        </div>
+
+        <div class="card">
+
+            <div class="tabs">
+                <button class="tab active" id="loginTab" onclick="showForm('login')">
+                    Login
+                </button>
+
+                <button class="tab" id="registerTab" onclick="showForm('register')">
+                    Admin Registration
+                </button>
+            </div>
+
+            <!-- LOGIN -->
+
+            <div class="form active" id="loginForm">
+
+                <label>Email / ईमेल</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+
+                <label>Password / पासवर्ड</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+
+                <button class="primary" onclick="loginAdmin()">
+                    Login / लॉगिन
+                </button>
+
+                <div id="loginMessage" class="message"></div>
+
+            </div>
+
+
+            <!-- REGISTRATION -->
+
+            <div class="form" id="registerForm">
+
+                <label>Admin Name / एडमिन का नाम</label>
+                <input type="text" id="regName" placeholder="Your full name">
+
+                <label>Mobile / मोबाइल</label>
+                <input type="tel" id="regMobile" placeholder="10 digit mobile number">
+
+                <label>Email / ईमेल</label>
+                <input type="email" id="regEmail" placeholder="Your email">
+
+                <label>Password / पासवर्ड</label>
+                <input type="password" id="regPassword" placeholder="Minimum 6 characters">
+
+                <label>Business Name / व्यवसाय का नाम</label>
+                <input type="text" id="businessName" placeholder="Example: RP Cyber Cafe">
+
+                <label>Business Type / व्यवसाय का प्रकार</label>
+                <select id="businessType">
+                    <option value="">Select Business Type</option>
+                </select>
+
+                <button class="primary" onclick="registerAdmin()">
+                    Create Admin Account
+                </button>
+
+                <div id="registerMessage" class="message"></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DASHBOARD -->
+
+    <section id="dashboardSection" class="dashboard">
+
+        <div class="dashboard-card">
+
+            <button class="logout" onclick="logoutAdmin()">
+                Logout
+            </button>
+
+            <h1>Welcome, <span id="adminName">Admin</span> 👋</h1>
+
+            <p style="margin-top:8px;color:#667085;">
+                RP Invoice Billing Dashboard
+            </p>
+
+            <div class="dashboard-grid">
+
+                <div class="stat">
+                    <h3>Today's Sales</h3>
+                    <p>₹0</p>
+                </div>
+
+                <div class="stat">
+                    <h3>Total Bills</h3>
+                    <p>0</p>
+                </div>
+
+                <div class="stat">
+                    <h3>Pending Amount</h3>
+                    <p>₹0</p>
+                </div>
+
+            </div>
+
+            <div style="margin-top:30px;padding:20px;background:#f7f9fc;border-radius:12px;">
+                <h2 id="businessTitle">Your Business</h2>
+                <p id="businessInfo" style="margin-top:8px;color:#667085;">
+                    Business information loading...
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+/* ==============================
+   SUPABASE CONFIGURATION
+   ============================== */
+
+const SUPABASE_URL = "https://tidyegzbuxrpnpfrdjgu.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_0h8WR657IRRpq05metJGvg_8FS4JsKY";
+
+const { createClient } =
+supabase;
+
+const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* ==============================
+   LANGUAGE
+   ============================== */
+
+let hindi = true;
+
+function toggleLanguage(){
+
+    hindi = !hindi;
+
+    document.getElementById("heroText").innerText =
+        hindi
+        ? "अपने व्यवसाय के लिए आसान और professional billing system"
+        : "Simple and professional billing system for your business";
+}
+
+
+/* ==============================
+   FORM SWITCH
+   ============================== */
+
+function showForm(type){
+
+    document.getElementById("loginForm").classList.remove("active");
+    document.getElementById("registerForm").classList.remove("active");
+
+    document.getElementById("loginTab").classList.remove("active");
+    document.getElementById("registerTab").classList.remove("active");
+
+    if(type === "login"){
+
+        document.getElementById("loginForm").classList.add("active");
+        document.getElementById("loginTab").classList.add("active");
+
+    }else{
+
+        document.getElementById("registerForm").classList.add("active");
+        document.getElementById("registerTab").classList.add("active");
+
+    }
+}
+
+
+/* ==============================
+   LOAD BUSINESS TYPES
+   ============================== */
+
+async function loadBusinessTypes(){
+
+    const { data, error } =
+        await db
+        .from("business_types")
+        .select("id,name_en,name_hi")
+        .eq("active",true)
+        .order("id");
+
+    const select =
+        document.getElementById("businessType");
+
+    if(error){
+
+        console.error(error);
+        return;
+
+    }
+
+    data.forEach(item => {
+
+        const option =
+        document.createElement("option");
+
+        option.value = item.id;
+
+        option.textContent =
+            item.name_hi + " / " + item.name_en;
+
+        select.appendChild(option);
+
+    });
+}
+
+
+/* ==============================
+   REGISTER ADMIN
+   ============================== */
+
+async function registerAdmin(){
+
+    const name =
+        document.getElementById("regName").value.trim();
+
+    const mobile =
+        document.getElementById("regMobile").value.trim();
+
+    const email =
+        document.getElementById("regEmail").value.trim();
+
+    const password =
+        document.getElementById("regPassword").value;
+
+    const businessName =
+        document.getElementById("businessName").value.trim();
+
+    const businessType =
+        document.getElementById("businessType").value;
+
+    const message =
+        document.getElementById("registerMessage");
+
+
+    message.className = "message";
+    message.style.display = "none";
+
+
+    if(!name || !mobile || !email ||
+       !password || !businessName || !businessType){
+
+        message.innerText =
+            "कृपया सभी जानकारी भरें।";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    if(password.length < 6){
+
+        message.innerText =
+            "Password कम से कम 6 characters का होना चाहिए।";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    message.innerText =
+        "Account बनाया जा रहा है...";
+
+    message.className =
+        "message success";
+
+
+    const { data, error } =
+        await db.auth.signUp({
+
+            email:email,
+
+            password:password,
+
+            options:{
+                data:{
+                    full_name:name,
+                    mobile:mobile
+                }
+            }
+
+        });
+
+
+    if(error){
+
+        message.innerText =
+            error.message;
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    if(!data.user){
+
+        message.innerText =
+            "Registration complete. कृपया email verification पूरा करें और फिर Login करें।";
+
+        message.className =
+            "message success";
+
+        return;
+    }
+
+
+    /*
+       Profile automatically created by
+       Supabase trigger.
+    */
+
+
+    const { error: businessError } =
+        await db
+        .from("businesses")
+        .insert({
+
+            admin_id:data.user.id,
+
+            business_name:businessName,
+
+            business_type:businessType,
+
+            owner_name:name,
+
+            mobile:mobile,
+
+            email:email
+
+        });
+
+
+    if(businessError){
+
+        console.error(businessError);
+
+        message.innerText =
+            "Admin account बन गया है, लेकिन business setup में समस्या आई।";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    message.innerText =
+        "Registration successful! Dashboard खुल रहा है...";
+
+    message.className =
+        "message success";
+
+
+    setTimeout(() => {
+
+        showDashboard();
+
+    },1000);
+
+}
+
+
+/* ==============================
+   LOGIN
+   ============================== */
+
+async function loginAdmin(){
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+
+    message.className = "message";
+    message.style.display = "none";
+
+
+    if(!email || !password){
+
+        message.innerText =
+            "Email और password भरें।";
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    message.innerText =
+        "Login हो रहा है...";
+
+    message.className =
+        "message success";
+
+
+    const { data,error } =
+        await db.auth.signInWithPassword({
+
+            email:email,
+
+            password:password
+
+        });
+
+
+    if(error){
+
+        message.innerText =
+            error.message;
+
+        message.className =
+            "message error";
+
+        return;
+    }
+
+
+    showDashboard();
+
+}
+
+
+/* ==============================
+   DASHBOARD
+   ============================== */
+
+async function showDashboard(){
+
+    const {
+        data:{
+            user
+        }
+    } =
+        await db.auth.getUser();
+
+
+    if(!user){
+        return;
+    }
+
+
+    document.getElementById("authSection")
+        .style.display = "none";
+
+    document.getElementById("dashboardSection")
+        .style.display = "block";
+
+
+    const { data:profile } =
+        await db
+        .from("profiles")
+        .select("full_name")
+        .eq("id",user.id)
+        .single();
+
+
+    if(profile){
+
+        document.getElementById("adminName")
+            .innerText =
+            profile.full_name || "Admin";
+
+    }
+
+
+    const { data:business } =
+        await db
+        .from("businesses")
+        .select("*")
+        .eq("admin_id",user.id)
+        .limit(1)
+        .maybeSingle();
+
+
+    if(business){
+
+        document.getElementById("businessTitle")
+            .innerText =
+            business.business_name;
+
+        document.getElementById("businessInfo")
+            .innerText =
+            (business.owner_name || "") +
+            " • " +
+            (business.mobile || "");
+
+    }
+
+}
+
+
+/* ==============================
+   LOGOUT
+   ============================== */
+
+async function logoutAdmin(){
+
+    await db.auth.signOut();
+
+    document.getElementById("dashboardSection")
+        .style.display = "none";
+
+    document.getElementById("authSection")
+        .style.display = "block";
+
+    showForm("login");
+
+}
+
+
+/* ==============================
+   CHECK EXISTING SESSION
+   ============================== */
+
+async function checkSession(){
+
+    const {
+        data:{
+            session
+        }
+    } =
+        await db.auth.getSession();
+
+
+    if(session){
+
+        showDashboard();
+
+    }
+
+}
+
+
+/* ==============================
+   START
+   ============================== */
+
+loadBusinessTypes();
+
+checkSession();
+
+</script>
+
+</body>
+</html>
