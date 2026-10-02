@@ -2190,27 +2190,42 @@ function comingSoon(name){
 }
 async function openBillHistory(){
 
-    const app = document.getElementById("app");
+    const dashboard = document.getElementById("dashboardSection");
 
-    app.innerHTML = `
-        <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-                <div>
-                    <h2>📋 Bill History</h2>
-                    <p style="margin:0;color:#666;">
-                        आपके बनाए गए सभी bills
-                    </p>
-                </div>
+    if(!dashboard){
+        alert("Dashboard section नहीं मिला।");
+        return;
+    }
 
-                <button class="btn"
-                        onclick="loadDashboard()">
+    dashboard.innerHTML = `
+        <div class="dashboard-top">
+
+            <div>
+                <h1>📋 Bill History</h1>
+
+                <p class="business-name">
+                    आपके बनाए गए सभी bills
+                </p>
+            </div>
+
+            <div>
+                <button class="menu-btn"
+                        onclick="location.reload()">
                     ← Dashboard
                 </button>
             </div>
 
-            <div id="billHistoryList" style="margin-top:20px;">
+        </div>
+
+        <div class="card"
+             style="margin-top:20px;">
+
+            <div id="billHistoryList">
+
                 <p>Loading bills...</p>
+
             </div>
+
         </div>
     `;
 
