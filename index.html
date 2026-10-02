@@ -745,76 +745,350 @@ input:focus,select:focus,textarea:focus{
         </div>
 
 
-        <!-- CUSTOMER -->
+       <!-- ================= CUSTOMER DETAILS ================= -->
 
-        <h3>Customer Details / ग्राहक विवरण</h3>
+<div style="
+    margin-top:25px;
+    padding:18px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:#fafafa;
+">
 
-        <div class="bill-grid">
+    <h3 style="
+        margin:0 0 15px;
+        font-size:18px;
+        border-bottom:1px solid #ddd;
+        padding-bottom:10px;
+    ">
+        Customer Details
+    </h3>
 
-            <div>
 
-                <label>Customer Name</label>
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+        gap:10px 25px;
+    ">
 
-                <input type="text"
-                       id="customerName"
-                       placeholder="Customer name">
+        <div>
+            <span style="color:#666;font-size:13px;">
+                Customer Name
+            </span>
 
+            <div style="
+                font-weight:600;
+                margin-top:3px;
+            ">
+                ${bill.customer_name || "Walk-in Customer"}
             </div>
-
-
-            <div>
-
-                <label>Mobile</label>
-
-                <input type="tel"
-                       id="customerMobile"
-                       placeholder="Mobile number">
-
-            </div>
-
-
-            <div>
-
-                <label>Address</label>
-
-                <input type="text"
-                       id="customerAddress"
-                       placeholder="Customer address">
-
-            </div>
-
-
-            <div>
-
-                <label>GSTIN (Optional)</label>
-
-                <input type="text"
-                       id="customerGstin"
-                       placeholder="GSTIN">
-
-            </div>
-
         </div>
 
 
-        <!-- ITEMS -->
+        ${
+            bill.customer_mobile
+            ? `
+                <div>
+                    <span style="color:#666;font-size:13px;">
+                        Mobile
+                    </span>
 
-        <div class="items-header">
-
-            <h3>
-                Products / Services
-            </h3>
-
-            <button class="secondary"
-                    onclick="addItem()">
-                + Add Item
-            </button>
-
-        </div>
+                    <div style="
+                        font-weight:600;
+                        margin-top:3px;
+                    ">
+                        📱 ${bill.customer_mobile}
+                    </div>
+                </div>
+              `
+            : ""
+        }
 
 
-        <div id="itemsContainer"></div>
+        ${
+            bill.customer_address
+            ? `
+                <div>
+                    <span style="color:#666;font-size:13px;">
+                        Address
+                    </span>
 
+                    <div style="
+                        margin-top:3px;
+                        line-height:1.5;
+                    ">
+                        ${bill.customer_address}
+                    </div>
+                </div>
+              `
+            : ""
+        }
+
+
+        ${
+            bill.customer_gstin
+            ? `
+                <div>
+                    <span style="color:#666;font-size:13px;">
+                        GSTIN
+                    </span>
+
+                    <div style="
+                        font-weight:600;
+                        margin-top:3px;
+                    ">
+                        ${bill.customer_gstin}
+                    </div>
+                </div>
+              `
+            : ""
+        }
+
+    </div>
+
+</div>
+
+
+<!-- ================= ITEMS TABLE ================= -->
+
+<div style="
+    margin-top:25px;
+">
+
+    <h3 style="
+        margin:0 0 12px;
+        font-size:18px;
+    ">
+        Items / Services
+    </h3>
+
+
+    <div style="
+        overflow-x:auto;
+        border:1px solid #ddd;
+        border-radius:10px;
+    ">
+
+        <table style="
+            width:100%;
+            min-width:650px;
+            border-collapse:collapse;
+            background:#fff;
+        ">
+
+            <thead>
+
+                <tr style="
+                    border-bottom:2px solid #222;
+                ">
+
+                    <th style="
+                        padding:12px;
+                        text-align:left;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        #
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:left;
+                        font-size:13px;
+                    ">
+                        Item / Service
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:center;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        Qty
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:right;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        Rate
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:right;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        Discount
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:right;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        GST
+                    </th>
+
+
+                    <th style="
+                        padding:12px;
+                        text-align:right;
+                        font-size:13px;
+                        white-space:nowrap;
+                    ">
+                        Amount
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${
+                    (billItems || []).length
+                    ? billItems.map((item,index) => {
+
+                        return `
+                            <tr>
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    vertical-align:top;
+                                ">
+                                    ${index + 1}
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    vertical-align:top;
+                                ">
+
+                                    <strong>
+                                        ${item.item_name}
+                                    </strong>
+
+                                    ${
+                                        item.description
+                                        ? `
+                                            <div style="
+                                                margin-top:4px;
+                                                font-size:12px;
+                                                color:#777;
+                                                line-height:1.4;
+                                            ">
+                                                ${item.description}
+                                            </div>
+                                          `
+                                        : ""
+                                    }
+
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    text-align:center;
+                                    vertical-align:top;
+                                ">
+                                    ${Number(item.quantity || 0)}
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    text-align:right;
+                                    vertical-align:top;
+                                    white-space:nowrap;
+                                ">
+                                    ₹${Number(item.rate || 0).toFixed(2)}
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    text-align:right;
+                                    vertical-align:top;
+                                    white-space:nowrap;
+                                ">
+                                    ₹${Number(item.discount || 0).toFixed(2)}
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    text-align:right;
+                                    vertical-align:top;
+                                    white-space:nowrap;
+                                ">
+                                    ${Number(item.gst_percent || 0).toFixed(2)}%
+                                    <div style="
+                                        font-size:11px;
+                                        color:#777;
+                                        margin-top:2px;
+                                    ">
+                                        ₹${Number(item.gst_amount || 0).toFixed(2)}
+                                    </div>
+                                </td>
+
+
+                                <td style="
+                                    padding:12px;
+                                    border-bottom:1px solid #eee;
+                                    text-align:right;
+                                    vertical-align:top;
+                                    font-weight:600;
+                                    white-space:nowrap;
+                                ">
+                                    ₹${Number(item.line_total || 0).toFixed(2)}
+                                </td>
+
+                            </tr>
+                        `;
+
+                    }).join("")
+                    : `
+                        <tr>
+                            <td
+                                colspan="7"
+                                style="
+                                    padding:25px;
+                                    text-align:center;
+                                    color:#777;
+                                "
+                            >
+                                No items found
+                            </td>
+                        </tr>
+                    `
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
         <!-- TOTALS -->
 
