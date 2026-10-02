@@ -2915,13 +2915,12 @@ async function viewBill(billId){
         }
 
         .invoice-paper {
-            width:148mm;
-            min-height:200mm;
-            border:none;
-            border-radius:0;
-            padding:8mm;
-        }
-
+    width:148mm;
+    min-height:auto;
+    border:none;
+    border-radius:0;
+    padding:3mm 3mm 8mm 3mm;
+}
         .invoice-title h1 {
             font-size:20px;
         }
@@ -2951,9 +2950,10 @@ async function viewBill(billId){
             width:240px;
         }
 
-        @page {
-            size:A5 portrait;
-            margin:0;
+       @page {
+    size:A5 portrait;
+    margin:0;
+}
         }
     }
 
