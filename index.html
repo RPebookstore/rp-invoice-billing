@@ -2290,7 +2290,33 @@ async function viewBill(billId){
 
         return;
     }
+    const {
+        data: business,
+        error: businessError
+    } = await db
+        .from("businesses")
+        .select(`
+            business_name,
+            business_type,
+            owner_name,
+            mobile,
+            email,
+            address,
+            city,
+            state,
+            pincode,
+            gstin,
+            logo_url
+        `)
+        .eq("admin_id", bill.admin_id)
+        .maybeSingle();
 
+
+    if(businessError){
+
+        console.error("Business load error:", businessError);
+
+    }
 
     const date = new Date(
         bill.created_at
