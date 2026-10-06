@@ -745,476 +745,214 @@ input:focus,select:focus,textarea:focus{
         </div>
 
 
-       <!-- ================= CUSTOMER DETAILS ================= -->
+     <!-- ================= CUSTOMER DETAILS ================= -->
 
-<div style="
-    margin-top:25px;
-    padding:18px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    background:#fafafa;
-">
+<div class="card" style="margin-top:20px;">
 
-    <h3 style="
-        margin:0 0 15px;
-        font-size:18px;
-        border-bottom:1px solid #ddd;
-        padding-bottom:10px;
-    ">
-        Customer Details
-    </h3>
+    <h3>👤 Customer Details</h3>
 
-
-    <div style="
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-        gap:10px 25px;
-    ">
+    <div class="bill-grid">
 
         <div>
-            <span style="color:#666;font-size:13px;">
-                Customer Name
-            </span>
-
-            <div style="
-                font-weight:600;
-                margin-top:3px;
-            ">
-                ${bill.customer_name || "Walk-in Customer"}
-            </div>
+            <label>Customer Name / ग्राहक का नाम</label>
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Customer Name">
         </div>
 
+        <div>
+            <label>Mobile / मोबाइल</label>
+            <input
+                type="text"
+                id="customerMobile"
+                placeholder="Mobile Number">
+        </div>
 
-        ${
-            bill.customer_mobile
-            ? `
-                <div>
-                    <span style="color:#666;font-size:13px;">
-                        Mobile
-                    </span>
+        <div>
+            <label>Address / पता</label>
+            <input
+                type="text"
+                id="customerAddress"
+                placeholder="Customer Address">
+        </div>
 
-                    <div style="
-                        font-weight:600;
-                        margin-top:3px;
-                    ">
-                        📱 ${bill.customer_mobile}
-                    </div>
-                </div>
-              `
-            : ""
-        }
-
-
-        ${
-            bill.customer_address
-            ? `
-                <div>
-                    <span style="color:#666;font-size:13px;">
-                        Address
-                    </span>
-
-                    <div style="
-                        margin-top:3px;
-                        line-height:1.5;
-                    ">
-                        ${bill.customer_address}
-                    </div>
-                </div>
-              `
-            : ""
-        }
-
-
-        ${
-            bill.customer_gstin
-            ? `
-                <div>
-                    <span style="color:#666;font-size:13px;">
-                        GSTIN
-                    </span>
-
-                    <div style="
-                        font-weight:600;
-                        margin-top:3px;
-                    ">
-                        ${bill.customer_gstin}
-                    </div>
-                </div>
-              `
-            : ""
-        }
+        <div>
+            <label>GSTIN</label>
+            <input
+                type="text"
+                id="customerGstin"
+                placeholder="GSTIN (Optional)">
+        </div>
 
     </div>
 
 </div>
 
 
-<!-- ================= ITEMS TABLE ================= -->
+<!-- ================= ITEMS ================= -->
 
-<div style="
-    margin-top:25px;
-">
+<div class="items-header">
 
-    <h3 style="
-        margin:0 0 12px;
-        font-size:18px;
-    ">
-        Items / Services
-    </h3>
+    <h3>📦 Items / Services</h3>
 
+    <button
+        class="secondary"
+        type="button"
+        onclick="addItem()">
+        + Add Item
+    </button>
 
-    <div style="
-        overflow-x:auto;
-        border:1px solid #ddd;
-        border-radius:10px;
-    ">
-
-        <table style="
-            width:100%;
-            min-width:650px;
-            border-collapse:collapse;
-            background:#fff;
-        ">
-
-            <thead>
-
-                <tr style="
-                    border-bottom:2px solid #222;
-                ">
-
-                    <th style="
-                        padding:12px;
-                        text-align:left;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        #
-                    </th>
+</div>
 
 
-                    <th style="
-                        padding:12px;
-                        text-align:left;
-                        font-size:13px;
-                    ">
-                        Item / Service
-                    </th>
+<div id="itemsContainer"></div>
 
 
-                    <th style="
-                        padding:12px;
-                        text-align:center;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        Qty
-                    </th>
+<!-- ================= TOTALS ================= -->
+
+<div class="totals">
+
+    <div class="total-line">
+
+        <span>Subtotal</span>
+
+        <strong id="subtotal">
+            ₹0.00
+        </strong>
+
+    </div>
 
 
-                    <th style="
-                        padding:12px;
-                        text-align:right;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        Rate
-                    </th>
+    <div class="total-line">
+
+        <span>Discount</span>
+
+        <strong id="discountTotal">
+            ₹0.00
+        </strong>
+
+    </div>
 
 
-                    <th style="
-                        padding:12px;
-                        text-align:right;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        Discount
-                    </th>
+    <div class="total-line">
+
+        <span>GST</span>
+
+        <strong id="gstTotal">
+            ₹0.00
+        </strong>
+
+    </div>
 
 
-                    <th style="
-                        padding:12px;
-                        text-align:right;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        GST
-                    </th>
+    <div class="total-line grand-total">
 
+        <span>Grand Total</span>
 
-                    <th style="
-                        padding:12px;
-                        text-align:right;
-                        font-size:13px;
-                        white-space:nowrap;
-                    ">
-                        Amount
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                ${
-                    (billItems || []).length
-                    ? billItems.map((item,index) => {
-
-                        return `
-                            <tr>
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    vertical-align:top;
-                                ">
-                                    ${index + 1}
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    vertical-align:top;
-                                ">
-
-                                    <strong>
-                                        ${item.item_name}
-                                    </strong>
-
-                                    ${
-                                        item.description
-                                        ? `
-                                            <div style="
-                                                margin-top:4px;
-                                                font-size:12px;
-                                                color:#777;
-                                                line-height:1.4;
-                                            ">
-                                                ${item.description}
-                                            </div>
-                                          `
-                                        : ""
-                                    }
-
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    text-align:center;
-                                    vertical-align:top;
-                                ">
-                                    ${Number(item.quantity || 0)}
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    text-align:right;
-                                    vertical-align:top;
-                                    white-space:nowrap;
-                                ">
-                                    ₹${Number(item.rate || 0).toFixed(2)}
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    text-align:right;
-                                    vertical-align:top;
-                                    white-space:nowrap;
-                                ">
-                                    ₹${Number(item.discount || 0).toFixed(2)}
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    text-align:right;
-                                    vertical-align:top;
-                                    white-space:nowrap;
-                                ">
-                                    ${Number(item.gst_percent || 0).toFixed(2)}%
-                                    <div style="
-                                        font-size:11px;
-                                        color:#777;
-                                        margin-top:2px;
-                                    ">
-                                        ₹${Number(item.gst_amount || 0).toFixed(2)}
-                                    </div>
-                                </td>
-
-
-                                <td style="
-                                    padding:12px;
-                                    border-bottom:1px solid #eee;
-                                    text-align:right;
-                                    vertical-align:top;
-                                    font-weight:600;
-                                    white-space:nowrap;
-                                ">
-                                    ₹${Number(item.line_total || 0).toFixed(2)}
-                                </td>
-
-                            </tr>
-                        `;
-
-                    }).join("")
-                    : `
-                        <tr>
-                            <td
-                                colspan="7"
-                                style="
-                                    padding:25px;
-                                    text-align:center;
-                                    color:#777;
-                                "
-                            >
-                                No items found
-                            </td>
-                        </tr>
-                    `
-                }
-
-            </tbody>
-
-        </table>
+        <strong id="grandTotal">
+            ₹0.00
+        </strong>
 
     </div>
 
 </div>
 
-        <!-- TOTALS -->
 
-        <div class="totals">
+<!-- ================= PAYMENT ================= -->
 
-            <div class="total-line">
+<div class="bill-grid"
+     style="margin-top:20px;">
 
-                <span>Subtotal</span>
+    <div>
 
-                <strong id="subtotal">
-                    ₹0.00
-                </strong>
+        <label>Payment Mode</label>
 
-            </div>
+        <select id="paymentMode">
 
+            <option value="cash">
+                Cash
+            </option>
 
-            <div class="total-line">
+            <option value="upi">
+                UPI
+            </option>
 
-                <span>Discount</span>
+            <option value="card">
+                Card
+            </option>
 
-                <strong id="discountTotal">
-                    ₹0.00
-                </strong>
+            <option value="bank">
+                Bank
+            </option>
 
-            </div>
+            <option value="other">
+                Other
+            </option>
 
+        </select>
 
-            <div class="total-line">
-
-                <span>GST</span>
-
-                <strong id="gstTotal">
-                    ₹0.00
-                </strong>
-
-            </div>
-
-
-            <div class="total-line grand-total">
-
-                <span>Grand Total</span>
-
-                <strong id="grandTotal">
-                    ₹0.00
-                </strong>
-
-            </div>
-
-        </div>
+    </div>
 
 
-        <!-- PAYMENT -->
+    <div>
 
-        <div class="bill-grid"
-             style="margin-top:20px;">
+        <label>Paid Amount</label>
 
-            <div>
+        <input
+            type="number"
+            id="paidAmount"
+            value="0"
+            min="0"
+            step="0.01"
+            oninput="calculateBill()">
 
-                <label>Payment Mode</label>
+    </div>
 
-                <select id="paymentMode">
-
-                    <option value="cash">
-                        Cash
-                    </option>
-
-                    <option value="upi">
-                        UPI
-                    </option>
-
-                    <option value="card">
-                        Card
-                    </option>
-
-                    <option value="bank">
-                        Bank
-                    </option>
-
-                    <option value="other">
-                        Other
-                    </option>
-
-                </select>
-
-            </div>
+</div>
 
 
-            <div>
+<!-- ================= NOTES ================= -->
 
-                <label>Paid Amount</label>
+<div style="margin-top:15px;">
 
-                <input type="number"
-                       id="paidAmount"
-                       value="0"
-                       min="0"
-                       step="0.01"
-                       oninput="calculateBill()">
+    <label>
+        Notes / टिप्पणी
+    </label>
 
-            </div>
+    <textarea
+        id="billNotes"
+        placeholder="Optional notes"></textarea>
 
-        </div>
-
-
-        <label>Notes / टिप्पणी</label>
-
-        <textarea id="billNotes"
-                  placeholder="Optional notes"></textarea>
+</div>
 
 
-        <div class="bill-actions">
+<!-- ================= ACTIONS ================= -->
 
-            <button class="primary"
-                    onclick="saveBill()">
-                Save Bill
-            </button>
+<div class="bill-actions">
 
-            <button class="secondary"
-                    onclick="clearBillForm()">
-                Clear
-            </button>
-
-        </div>
+    <button
+        class="primary"
+        type="button"
+        onclick="saveBill()">
+        💾 Save Bill
+    </button>
 
 
-        <div id="billMessage"
-             class="message"></div>
+    <button
+        class="secondary"
+        type="button"
+        onclick="clearBillForm()">
+        Clear
+    </button>
+
+</div>
+
+
+<div
+    id="billMessage"
+    class="message">
+</div>
 
     </section>
 
