@@ -81,6 +81,11 @@ maxlength="10" placeholder="10 अंकों का मोबाइल नं�
 </div>
 <p class="muted">कृपया अपना टोकन नंबर सुरक्षित रखें। अगले चरण में इसी टोकन से आप अपनी लाइव स्थिति देख सकेंगे।</p>
 <p class="small" id="accessKeyText"></p>
+<a id="statusLink"
+   href="#"
+   style="display:block;text-align:center;background:#2563eb;color:white;padding:14px;border-radius:9px;text-decoration:none;font-weight:bold;margin-top:15px;">
+   अपनी लाइव कतार स्थिति देखें
+</a>    
 </div>
 </main>
 
@@ -228,7 +233,8 @@ $("tokenForm").addEventListener("submit", async event => {
     });
         $("accessKeyText").textContent =
             "आपकी निजी टोकन पहचान: " + data.access_key;
-
+     $("statusLink").href =
+    "status.html?key=" + encodeURIComponent(data.access_key);
         window.scrollTo({top:0,behavior:"smooth"});
 
     } catch (error) {
