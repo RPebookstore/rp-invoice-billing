@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP TOKEN - QR Code Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="assets/js/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#172554;color:white;padding:20px}
+header h2{margin:0}
+header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:700px;margin:25px auto;padding:0 14px}
+.card{background:white;padding:20px;border-radius:15px;margin-bottom:16px;box-shadow:0 3px 15px #0000000a}
+label{display:block;font-weight:bold;font-size:14px;margin-bottom:8px}
+select{width:100%;padding:13px;border:1px solid #dbe1eb;border-radius:9px;font-size:15px;background:white}
+button{border:0;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{background:#2563eb;color:white}
+.green{background:#15803d;color:white}
+.gray{background:#e2e8f0;color:#172033}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+#qrCard{display:none;text-align:center}
+#qrBox{display:inline-block;background:white;padding:15px;border:1px solid #e5e7eb;border-radius:12px;margin:15px auto}
+#qrBox canvas,#qrBox img{max-width:100%;height:auto}
+.shop-name{font-size:22px;font-weight:bold;margin-top:12px}
+.hint{font-size:13px;color:#64748b;line-height:1.6}
+.url{background:#f1f5f9;padding:12px;border-radius:8px;overflow-wrap:anywhere;font-size:12px;margin-top:12px}
+.notice{padding:12px;background:#eff6ff;color:#1d4ed8;border-radius:9px;font-size:13px}
+.error{background:#fef2f2;color:#b91c1c}
+.empty{text-align:center;color:#64748b;padding:20px}
+@media print{
+body{background:white}
+header,main>.card:not(#qrCard),.actions,.hint,.url,.notice{display:none!important}
+main{margin:0;padding:0}
+#qrCard{display:block!important;box-shadow:none;border:0;margin:0;padding:35px}
+#qrBox{border:0}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h2>RP TOKEN</h2>
+<p>Shop QR Code Generator</p>
+</header>
+
+<main>
+<div class="card">
+<h3 style="margin-top:0">अपनी दुकान का QR Code बनाएँ</h3>
+<label for="shopSelect">दुकान चुनें</label>
+<select id="shopSelect">
+<option value="">दुकान लोड हो रही है...</option>
+</select>
+<p class="hint">हर दुकान के लिए अलग QR Code बनाया जाएगा।</p>
+</div>
+
+<div class="card" id="qrCard">
+<div class="shop-name" id="shopName"></div>
+<p class="hint">टोकन लेने के लिए QR Code स्कैन करें</p>
+
+<div id="qrBox">
+<div id="qrcode"></div>
+</div>
+
+<p class="hint">RP TOKEN – Digital Queue Management</p>
+
+<div class="url" id="bookingUrl"></div>
+
+<div class="actions" style="justify-content:center">
+<button class="primary" id="downloadBtn">⬇ Download QR</button>
+<button class="green" id="printBtn">🖨 Print QR</button>
+<button class="gray" id="copyBtn">Copy Booking Link</button>
+</div>
+</div>
+
+<div id="message" class="notice">पहले Login करें और अपनी दुकान चुनें।</div>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.supabaseClient;
+const $ = id => document.getElementById(id);
+let shops = [];
+let selectedShop = null;
+let bookingLink = "";
+
+function message(text,error=false){
+    $("message").textContent=text;
+    $("message").className=error?"notice error":"notice";
+    $("message").style.display="block";
+}
+
+function escapeText(value){
+    return String(value ?? "").replace(/[&<>"']/g,c=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    })[c]);
+}
+
+async function loadShops(){
+    if(!db){
+        message("Supabase कनेक्शन नहीं मिला। config.js जाँचें।",true);
+        return;
+    }
+
+    try{
+        const {data:{session},error:authError}=await db.auth.getSession();
+        if(authError) throw authError;
+
+        if(!session){
+            message("पहले Login करें।",true);
+            $("shopSelect").innerHTML='<option value="">Login आवश्यक है</option>';
+            return;
+        }
+
+        const user=session.user;
+
+        const {data:members,error:memberError}=await db
+            .from("shop_members")
+            .select("shop_id")
+            .eq("user_id",user.id)
+            .eq("is_active",true);
+
+        if(memberError) throw memberError;
+
+        const {data:owned,error:ownerError}=await db
+            .from("shops")
+            .select("id,owner_id,name,slug,is_active")
+            .eq("owner_id",user.id)
+            .eq("is_active",true);
+
+        if(ownerError) throw ownerError;
+
+        const ids=[...new Set([
+            ...(members||[]).map(m=>m.shop_id),
+            ...(owned||[]).map(s=>s.id)
+        ])];
+
+        if(!ids.length){
+            $("shopSelect").innerHTML='<option value="">कोई दुकान नहीं मिली</option>';
+            message("आपके खाते में कोई सक्रिय दुकान नहीं है।",true);
+            return;
+        }
+
+        const {data,error}=await db
+            .from("shops")
+            .select("id,name,slug,is_active")
+            .in("id",ids)
+            .eq("is_active",true);
+
+        if(error) throw error;
+
+        shops=data||[];
+
+        $("shopSelect").innerHTML=
+            '<option value="">दुकान चुनें</option>'+
+            shops.map(s=>
+                `<option value="${escapeText(s.id)}">${escapeText(s.name)}</option>`
+            ).join("");
+
+        if(shops.length===1){
+            $("shopSelect").value=shops[0].id;
+            generateQR();
+        }
+
+    }catch(error){
+        message("दुकान लोड नहीं हुई: "+error.message,true);
+    }
+}
+
+function generateQR(){
+    const id=$("shopSelect").value;
+    selectedShop=shops.find(s=>s.id===id);
+
+    $("qrCard").style.display="none";
+    $("qrcode").innerHTML="";
+
+    if(!selectedShop) return;
+
+    if(!selectedShop.slug){
+        message("इस दुकान का URL Slug उपलब्ध नहीं है।",true);
+        return;
+    }
+
+    const baseUrl=window.location.href.split("?")[0]
+        .replace(/qr-code\.html$/i,"");
+
+    bookingLink=baseUrl+"customer.html?shop="+
+        encodeURIComponent(selectedShop.slug);
+
+    $("shopName").textContent=selectedShop.name;
+    $("bookingUrl").textContent=bookingLink;
+
+    try{
+        new QRCode($("qrcode"),{
+            text:bookingLink,
+            width:260,
+            height:260,
+            colorDark:"#111827",
+            colorLight:"#ffffff",
+            correctLevel:QRCode.CorrectLevel.H
+        });
+
+        $("qrCard").style.display="block";
+        $("message").style.display="none";
+
+    }catch(error){
+        message("QR Code नहीं बन पाया: "+error.message,true);
+    }
+}
+
+function getQRImage(){
+    const canvas=$("qrcode").querySelector("canvas");
+    if(canvas) return canvas.toDataURL("image/png");
+
+    const img=$("qrcode").querySelector("img");
+    if(img && img.complete){
+        const canvas2=document.createElement("canvas");
+        canvas2.width=img.naturalWidth||260;
+        canvas2.height=img.naturalHeight||260;
+        canvas2.getContext("2d").drawImage(img,0,0);
+        return canvas2.toDataURL("image/png");
+    }
+    return null;
+}
+
+function downloadQR(){
+    if(!selectedShop) return;
+
+    const image=getQRImage();
+    if(!image){
+        message("QR Code तैयार हो रहा है। एक सेकंड बाद फिर कोशिश करें।",true);
+        return;
+    }
+
+    const a=document.createElement("a");
+    a.href=image;
+    a.download=selectedShop.slug+"-RP-TOKEN-QR.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function printQR(){
+    if(!selectedShop) return;
+
+    const image=getQRImage();
+    if(!image){
+        message("QR Code अभी तैयार नहीं है।",true);
+        return;
+    }
+
+    const w=window.open("","_blank");
+    if(!w){
+        message("Print के लिए Browser में Pop-ups Allow करें।",true);
+        return;
+    }
+
+    w.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>RP TOKEN QR</title>
+    <style>
+    body{font-family:Arial;text-align:center;padding:35px}
+    img{width:260px;height:260px}
+    h1{font-size:26px}
+    p{font-size:16px}
+    </style>
+    </head>
+    <body>
+    <h1>${escapeText(selectedShop.name)}</h1>
+    <p>टोकन लेने के लिए QR Code स्कैन करें</p>
+    <img src="${image}" alt="Shop QR Code">
+    <p>Powered by RP TOKEN</p>
+    <script>window.onload=()=>window.print();<\/script>
+    </body>
+    </html>`);
+    w.document.close();
+}
+
+async function copyLink(){
+    if(!bookingLink) return;
+
+    try{
+        await navigator.clipboard.writeText(bookingLink);
+        message("Booking Link कॉपी हो गया।");
+    }catch{
+        message("Link कॉपी नहीं हुआ। ऊपर दिख रहे Link को मैन्युअली कॉपी करें।",true);
+    }
+}
+
+$("shopSelect").addEventListener("change",generateQR);
+$("downloadBtn").addEventListener("click",downloadQR);
+$("printBtn").addEventListener("click",printQR);
+$("copyBtn").addEventListener("click",copyLink);
+
+loadShops();
+})();
+</script>
+</body>
+</html>
