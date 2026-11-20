@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>RP TOKEN | Business Dashboard</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f6fb;color:#182338;min-height:100vh}
+header{background:#101827;color:white;padding:17px 6%;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:23px;font-weight:800}
+.brand span{color:#38bdf8}
+.logout{background:#dc2626;color:white;border:0;border-radius:7px;padding:10px 15px;cursor:pointer}
+.container{max-width:950px;margin:35px auto;padding:0 16px}
+.welcome{margin-bottom:25px}
+.welcome h1{font-size:27px;margin-bottom:8px}
+.welcome p{color:#64748b;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:white;padding:24px;border-radius:15px;border:1px solid #e5eaf1;box-shadow:0 8px 25px rgba(15,23,42,.04)}
+.card h2{font-size:20px;margin-bottom:8px}
+.muted{color:#64748b;font-size:13px;line-height:1.6;margin-bottom:20px}
+.field{margin-bottom:15px}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+input,select{width:100%;padding:12px;border:1px solid #d8e0ea;border-radius:8px;font-size:14px;background:white}
+input:focus,select:focus{outline:2px solid #bae6fd;border-color:#0284c7}
+.primary{width:100%;background:#087fc4;color:white;border:0;border-radius:8px;padding:13px;font-size:14px;font-weight:bold;cursor:pointer}
+.primary:disabled{opacity:.6;cursor:not-allowed}
+.message{display:none;padding:12px;border-radius:8px;font-size:13px;line-height:1.5;margin-bottom:15px;overflow-wrap:anywhere}
+.message.success{display:block;background:#e9f9ef;color:#166534}
+.message.error{display:block;background:#fff0f0;color:#b42318}
+.shop-item{padding:15px;border:1px solid #e2e8f0;border-radius:10px;margin-top:12px}
+.shop-item h3{font-size:16px;margin-bottom:6px}
+.shop-item p{font-size:12px;color:#64748b;line-height:1.6}
+.slug-note{font-size:11px;color:#64748b;margin-top:5px}
+.empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px;border:1px dashed #cbd5e1;border-radius:10px}
+footer{text-align:center;color:#94a3b8;font-size:12px;padding:30px}
+.hidden{display:none!important}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.container{margin:25px auto}.card{padding:20px}.welcome h1{font-size:23px}}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand">RP <span>TOKEN</span></div>
+  <button class="logout" id="logoutBtn">Logout</button>
+</header>
+
+<main class="container">
+  <section class="welcome">
+    <h1>Business Dashboard</h1>
+    <p>अपनी दुकान बनाएँ और डिजिटल टोकन सिस्टम शुरू करें।</p>
+  </section>
+
+  <div id="message" class="message" role="status" aria-live="polite"></div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>नई दुकान जोड़ें</h2>
+      <p class="muted">अपनी दुकान की जानकारी भरें। दुकान बन जाने पर आप उसके Owner होंगे।</p>
+
+      <form id="shopForm">
+        <div class="field">
+          <label for="shopName">दुकान / व्यवसाय का नाम *</label>
+          <input id="shopName" type="text" maxlength="100"
+                 placeholder="जैसे: Rawat Hair Salon" required>
+        </div>
+
+        <div class="field">
+          <label for="shopSlug">दुकान का URL नाम *</label>
+          <input id="shopSlug" type="text" minlength="3" maxlength="40"
+                 pattern="[a-z0-9-]{3,40}"
+                 placeholder="rawat-hair-salon" required>
+          <p class="slug-note">केवल छोटे English अक्षर, नंबर और hyphen इस्तेमाल करें। यह नाम अलग होना चाहिए।</p>
+        </div>
+
+        <div class="field">
+          <label for="businessType">व्यवसाय का प्रकार *</label>
+          <select id="businessType" required>
+            <option value="other">अन्य व्यवसाय</option>
+            <option value="barber">Barber / Hair Salon</option>
+            <option value="salon">Beauty Salon / Spa</option>
+            <option value="clinic">Clinic / Doctor</option>
+            <option value="hospital">Hospital</option>
+            <option value="garage">Garage / Workshop</option>
+            <option value="service_center">Service Center</option>
+            <option value="restaurant">Restaurant / Cafe</option>
+            <option value="retail">Retail Shop</option>
+            <option value="office">Office / Consultancy</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="city">शहर / कस्बा</label>
+          <input id="city" type="text" maxlength="80"
+                 placeholder="जैसे: Lucknow">
+        </div>
+
+        <button class="primary" id="createBtn" type="submit">
+          दुकान बनाएँ
+        </button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>मेरे व्यवसाय</h2>
+      <p class="muted">आपके अकाउंट से जुड़ी दुकानें यहाँ दिखाई देंगी।</p>
+      <div id="shopList">
+        <div class="empty">दुकानों की जानकारी लोड हो रही है...</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>RP TOKEN — Smart Queue Management Platform</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const db = window.supabaseClient;
+  const message = document.getElementById("message");
+  const form = document.getElementById("shopForm");
+  const createBtn = document.getElementById("createBtn");
+  const shopList = document.getElementById("shopList");
+
+  if (!db) {
+    showMessage("Supabase कनेक्शन नहीं मिला। config.js जाँचें।", "error");
+    return;
+  }
+
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "message " + type;
+  }
+
+  function clearMessage() {
+    message.textContent = "";
+    message.className = "message";
+  }
+
+  function makeSlug(value) {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40);
+  }
+
+  document.getElementById("shopName").addEventListener("input", (event) => {
+    const slugInput = document.getElementById("shopSlug");
+    if (!slugInput.dataset.edited) {
+      slugInput.value = makeSlug(event.target.value);
+    }
+  });
+
+  document.getElementById("shopSlug").addEventListener("input", (event) => {
+    event.target.dataset.edited = "true";
+    event.target.value = event.target.value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "");
+  });
+
+  async function loadShops() {
+    shopList.replaceChildren();
+
+    const { data, error } = await db
+      .from("shops")
+      .select("id,name,slug,business_type,city,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      shopList.textContent = "दुकानों की जानकारी लोड नहीं हुई: " + error.message;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "अभी कोई दुकान नहीं बनाई गई है।";
+      shopList.appendChild(empty);
+      return;
+    }
+
+    data.forEach((shop) => {
+      const item = document.createElement("div");
+      item.className = "shop-item";
+
+      const title = document.createElement("h3");
+      title.textContent = shop.name;
+
+      const details = document.createElement("p");
+      details.textContent =
+        "URL: " + shop.slug +
+        " | प्रकार: " + shop.business_type +
+        (shop.city ? " | शहर: " + shop.city : "");
+
+      item.append(title, details);
+      shopList.appendChild(item);
+    });
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearMessage();
+
+    const name = document.getElementById("shopName").value.trim();
+    const slug = document.getElementById("shopSlug").value.trim();
+    const type = document.getElementById("businessType").value;
+    const city = document.getElementById("city").value.trim();
+
+    if (name.length < 2) {
+      showMessage("दुकान का सही नाम दर्ज करें।", "error");
+      return;
+    }
+
+    if (!/^[a-z0-9-]{3,40}$/.test(slug)) {
+      showMessage("URL नाम 3 से 40 अक्षरों का होना चाहिए। केवल a-z, 0-9 और hyphen इस्तेमाल करें।", "error");
+      return;
+    }
+
+    createBtn.disabled = true;
+    createBtn.textContent = "दुकान बनाई जा रही है...";
+
+    try {
+      const { data, error } = await db.rpc("create_shop", {
+        p_name: name,
+        p_slug: slug,
+        p_business_type: type,
+        p_city: city || null
+      });
+
+      if (error) throw error;
+
+      if (!data || !data.success) {
+        throw new Error("दुकान बनाने की पुष्टि नहीं मिली।");
+      }
+
+      showMessage("बधाई हो! आपकी दुकान सफलतापूर्वक बन गई है।", "success");
+      form.reset();
+      document.getElementById("shopSlug").dataset.edited = "";
+      await loadShops();
+
+    } catch (error) {
+      showMessage(error.message || "दुकान नहीं बन सकी।", "error");
+    } finally {
+      createBtn.disabled = false;
+      createBtn.textContent = "दुकान बनाएँ";
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const { error } = await db.auth.signOut();
+    if (error) {
+      showMessage(error.message, "error");
+      return;
+    }
+    window.location.href = "index.html";
+  });
+
+  async function initialize() {
+    const { data, error } = await db.auth.getSession();
+
+    if (error || !data.session) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    await loadShops();
+  }
+
+  initialize();
+})();
+</script>
+</body>
+</html>
