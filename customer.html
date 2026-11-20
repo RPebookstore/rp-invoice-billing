@@ -28,7 +28,7 @@ main{max-width:480px;margin:22px auto;padding:0 14px 30px}
  font-size:23px;font-weight:800;text-align:center;
  margin:0 0 7px;color:#172554;
 }
-.subtitle{text-align:center;color:#64748b;font-size:13px;margin:0 0 22px}
+.subtitle{text-align:center;color:#64748b;font-size:13px;margin:0 0 18px}
 label{display:block;font-size:13px;font-weight:bold;margin:15px 0 7px}
 input,select{
  width:100%;padding:14px;border:1px solid #dbe1eb;
@@ -50,6 +50,14 @@ button:disabled{opacity:.6;cursor:not-allowed}
 }
 .error{background:#fef2f2;color:#b91c1c}
 .success{background:#f0fdf4;color:#166534}
+.status-box{
+ padding:12px;border-radius:10px;text-align:center;
+ font-size:13px;font-weight:bold;margin:0 0 18px;
+ line-height:1.5;
+}
+.status-open{background:#f0fdf4;color:#166534}
+.status-closed{background:#fef2f2;color:#b91c1c}
+.status-info{background:#eff6ff;color:#1d4ed8}
 #result{display:none;text-align:center}
 .token-number{
  font-size:48px;font-weight:900;color:#2563eb;
@@ -78,6 +86,8 @@ button:disabled{opacity:.6;cursor:not-allowed}
  <div class="card" id="bookingCard" style="display:none">
   <h1 class="shop-name" id="shopName"></h1>
   <p class="subtitle">टोकन प्राप्त करने के लिए नीचे जानकारी भरें</p>
+
+  <div id="shopStatus" class="status-box status-info"></div>
 
   <form id="bookingForm">
    <label for="customerName">आपका नाम</label>
@@ -149,10 +159,25 @@ function showMessage(text,isError=true){
  box.style.display="block";
 }
 
-function escapeText(value){
- return String(value ?? "").replace(/[&<>"']/g,c=>({
-  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
- })[c]);
+function setBookingEnabled(enabled){
+ const form=$("bookingForm");
+ form.querySelectorAll("input,select,button").forEach(el=>{
+  el.disabled=!enabled;
+ });
+}
+
+function renderShopStatus(data){
+ const box=$("shopStatus");
+
+ if(data.can_book){
+  box.textContent="● "+(data.status_message || "टोकन बुकिंग उपलब्ध है।");
+  box.className="status-box status-open";
+ }else{
+  box.textContent="● "+(data.status_message || "फिलहाल टोकन बुकिंग उपलब्ध नहीं है।");
+  box.className="status-box status-closed";
+ }
+
+ setBookingEnabled(Boolean(data.can_book));
 }
 
 function renderServices(){
@@ -200,15 +225,16 @@ async function loadShop(){
 
   $("shopName").textContent=data.shop_name;
   $("loading").style.display="none";
+  $("bookingCard").style.display="block";
+
+  renderShopStatus(data);
 
   if(!services.length){
-   $("bookingCard").style.display="block";
    $("bookingForm").style.display="none";
    showMessage("इस दुकान पर अभी कोई सक्रिय सेवा उपलब्ध नहीं है।",true);
    return;
   }
 
-  $("bookingCard").style.display="block";
   renderServices();
 
  }catch(error){
@@ -224,6 +250,12 @@ $("customerPhone").addEventListener("input",()=>{
 
 $("bookingForm").addEventListener("submit",async event=>{
  event.preventDefault();
+
+ if(!shopInfo?.can_book){
+  showMessage(shopInfo?.status_message || "फिलहाल टोकन बुकिंग उपलब्ध नहीं है।");
+  setBookingEnabled(false);
+  return;
+ }
 
  const name=$("customerName").value.trim();
  const phone=$("customerPhone").value.trim();
