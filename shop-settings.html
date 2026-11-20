@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP TOKEN - Shop Settings</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f5fa;font-family:Arial,sans-serif;color:#172033}
+.container{max-width:850px;margin:25px auto;padding:15px}
+.header{background:#123b73;color:white;padding:23px;border-radius:15px;margin-bottom:18px}
+.header h1{margin:0 0 8px;font-size:25px}
+.header p{margin:0;color:#e2eafa}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:17px;box-shadow:0 4px 18px #0000000b}
+h2{font-size:19px;margin:0 0 16px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}
+input,select{width:100%;padding:12px;border:1px solid #ccd5e2;border-radius:9px;font-size:15px;background:white}
+.field{margin-bottom:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 0;border-bottom:1px solid #edf0f5}
+.toggle-row:last-child{border:0}
+.toggle-row strong{font-size:15px}
+.toggle-row small{display:block;color:#718096;margin-top:5px;line-height:1.4}
+.toggle-row input{width:22px;height:22px;flex-shrink:0}
+.day{display:grid;grid-template-columns:95px 1fr 1fr 75px;gap:9px;align-items:center;padding:12px 0;border-bottom:1px solid #edf0f5}
+.day-name{font-weight:700;font-size:14px}
+.day input[type=time]{padding:10px 5px}
+.closed{display:flex;align-items:center;gap:5px;font-size:13px}
+.closed input{width:18px;height:18px}
+button{border:0;border-radius:10px;padding:14px 18px;font-size:15px;font-weight:700;cursor:pointer}
+.save{width:100%;background:#1456a0;color:white}
+.secondary{background:#e8eef8;color:#17345b}
+#message{padding:13px;border-radius:9px;margin:12px 0;display:none;line-height:1.5}
+.success{display:block!important;background:#e7f7ed;color:#176b38}
+.error{display:block!important;background:#ffeded;color:#a12626}
+.info{background:#eef4ff;padding:12px;border-radius:9px;font-size:13px;color:#345078;line-height:1.5}
+@media(max-width:600px){
+ .container{margin:8px auto;padding:10px}
+ .row{grid-template-columns:1fr}
+ .day{grid-template-columns:70px 1fr 1fr 65px;gap:5px}
+ .day-name{font-size:12px}
+ .day input[type=time]{font-size:12px}
+ .closed{font-size:11px}
+ .card{padding:15px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>RP TOKEN</h1>
+<p>दुकान की सेटिंग और समय-सारणी</p>
+</div>
+
+<div class="card">
+<h2>दुकान चुनें</h2>
+<div class="field">
+<label>आपकी दुकान</label>
+<select id="shopSelect">
+<option value="">दुकान लोड हो रही है...</option>
+</select>
+</div>
+<div id="message"></div>
+</div>
+
+<div id="settingsArea" style="display:none">
+
+<div class="card">
+<h2>दुकान और बुकिंग नियंत्रण</h2>
+
+<div class="toggle-row">
+<div>
+<strong>दुकान चालू रखें</strong>
+<small>बंद करने पर ग्राहक नया टोकन नहीं बना पाएँगे।</small>
+</div>
+<input type="checkbox" id="isOpen">
+</div>
+
+<div class="toggle-row">
+<div>
+<strong>ऑनलाइन टोकन बुकिंग</strong>
+<small>इसे बंद करने पर ग्राहक वेबसाइट से टोकन नहीं ले सकेंगे।</small>
+</div>
+<input type="checkbox" id="bookingEnabled">
+</div>
+
+<div class="toggle-row">
+<div>
+<strong>ग्राहकों को सेवा की कीमत दिखाएँ</strong>
+<small>बंद करने पर ग्राहक को कीमत नहीं दिखेगी।</small>
+</div>
+<input type="checkbox" id="showPrices">
+</div>
+
+<div class="row" style="margin-top:18px">
+<div class="field">
+<label>प्रतिदिन अधिकतम टोकन</label>
+<input type="number" id="dailyLimit" min="1" placeholder="खाली छोड़ें = कोई सीमा नहीं">
+</div>
+<div class="field">
+<label>टोकन Prefix</label>
+<input type="text" id="tokenPrefix" maxlength="5" placeholder="T">
+</div>
+</div>
+<div class="info">उदाहरण: Prefix T रखने पर T001, T002 और Prefix A रखने पर A001, A002 बनेगा। अधिकतम टोकन खाली छोड़ने पर कोई दैनिक सीमा नहीं होगी।</div>
+</div>
+
+<div class="card">
+<h2>साप्ताहिक समय-सारणी</h2>
+<p style="font-size:13px;color:#68778c;line-height:1.5">दुकान के खुलने और बंद होने का समय चुनें। छुट्टी वाले दिन “बंद” चुनें। समय दुकान के स्थानीय समय के अनुसार माना जाएगा।</p>
+<div id="days"></div>
+</div>
+
+<button class="save" id="saveBtn">सभी सेटिंग सेव करें</button>
+<p class="info" style="margin-top:12px">सेटिंग सेव करने के बाद ग्राहक की अगली बुकिंग पर ये नियम लागू होंगे।</p>
+
+</div>
+</div>
+
+<script>
+(() => {
+const db = window.supabaseClient;
+const $ = id => document.getElementById(id);
+
+const dayNames = [
+  'रविवार','सोमवार','मंगलवार','बुधवार',
+  'गुरुवार','शुक्रवार','शनिवार'
+];
+
+let shops = [];
+let currentShop = null;
+
+function showMessage(message, type='success') {
+  const box = $('message');
+  box.textContent = message;
+  box.className = type;
+  box.style.display = 'block';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function clearMessage() {
+  $('message').style.display = 'none';
+  $('message').textContent = '';
+}
+
+function createDayRows() {
+  $('days').innerHTML = dayNames.map((name, day) => {
+    const closed = day === 0;
+    return `
+      <div class="day" data-day="${day}">
+        <div class="day-name">${name}</div>
+        <input type="time" class="openTime" value="09:00" aria-label="${name} खुलने का समय">
+        <input type="time" class="closeTime" value="18:00" aria-label="${name} बंद होने का समय">
+        <label class="closed">
+          <input type="checkbox" class="isClosed" ${closed?'checked':''}>
+          बंद
+        </label>
+      </div>`;
+  }).join('');
+
+  document.querySelectorAll('.day').forEach(row => {
+    const checkbox = row.querySelector('.isClosed');
+    const times = row.querySelectorAll('input[type=time]');
+    function update() {
+      times.forEach(input => input.disabled = checkbox.checked);
+    }
+    checkbox.addEventListener('change', update);
+    update();
+  });
+}
+
+async function loadShops() {
+  if (!db) {
+    showMessage('Supabase client नहीं मिला। config.js की जाँच करें।','error');
+    return;
+  }
+
+  const {data:{user},error:userError} = await db.auth.getUser();
+  if (userError || !user) {
+    showMessage('पहले अपने RP TOKEN अकाउंट में लॉगिन करें।','error');
+    return;
+  }
+
+  const {data,error} = await db
+    .from('shops')
+    .select('id,name,slug')
+    .order('created_at',{ascending:false});
+
+  if (error) {
+    showMessage('दुकान लोड नहीं हुई: '+error.message,'error');
+    return;
+  }
+
+  shops = data || [];
+  $('shopSelect').innerHTML = '<option value="">दुकान चुनें</option>';
+
+  shops.forEach(shop => {
+    const option = document.createElement('option');
+    option.value = shop.id;
+    option.textContent = shop.name;
+    $('shopSelect').appendChild(option);
+  });
+
+  if (!shops.length) {
+    showMessage('आपके अकाउंट में कोई दुकान नहीं मिली।','error');
+    return;
+  }
+
+  $('shopSelect').value = shops[0].id;
+  await loadSelectedShop();
+}
+
+async function loadSelectedShop() {
+  clearMessage();
+  const shopId = $('shopSelect').value;
+  currentShop = shops.find(s => s.id === shopId);
+
+  if (!currentShop) {
+    $('settingsArea').style.display = 'none';
+    return;
+  }
+
+  $('settingsArea').style.display = 'block';
+
+  const [settingsResult,hoursResult] = await Promise.all([
+    db.from('shop_settings')
+      .select('*')
+      .eq('shop_id',shopId)
+      .maybeSingle(),
+
+    db.from('shop_hours')
+      .select('*')
+      .eq('shop_id',shopId)
+  ]);
+
+  if (settingsResult.error) {
+    showMessage('सेटिंग लोड करने में समस्या: '+settingsResult.error.message,'error');
+    return;
+  }
+
+  if (hoursResult.error) {
+    showMessage('दुकान का समय लोड नहीं हुआ: '+hoursResult.error.message,'error');
+    return;
+  }
+
+  const settings = settingsResult.data || {};
+
+  $('isOpen').checked = settings.is_open ?? true;
+  $('bookingEnabled').checked = settings.booking_enabled ?? true;
+  $('showPrices').checked = settings.show_prices_to_customers ?? false;
+  $('dailyLimit').value = settings.daily_token_limit ?? '';
+  $('tokenPrefix').value = settings.token_prefix ?? 'T';
+
+  createDayRows();
+
+  (hoursResult.data || []).forEach(hour => {
+    const row = document.querySelector(`.day[data-day="${hour.day_of_week}"]`);
+    if (!row) return;
+
+    row.querySelector('.isClosed').checked = hour.is_closed;
+    if (hour.open_time) {
+      row.querySelector('.openTime').value = hour.open_time.slice(0,5);
+    }
+    if (hour.close_time) {
+      row.querySelector('.closeTime').value = hour.close_time.slice(0,5);
+    }
+    row.querySelector('.isClosed').dispatchEvent(new Event('change'));
+  });
+
+  showMessage('दुकान की सेटिंग लोड हो गई।');
+}
+
+async function saveSettings() {
+  clearMessage();
+
+  if (!currentShop) {
+    showMessage('पहले दुकान चुनें।','error');
+    return;
+  }
+
+  const limitValue = $('dailyLimit').value.trim();
+  const limit = limitValue === '' ? null : Number(limitValue);
+  const prefix = $('tokenPrefix').value.trim().toUpperCase() || 'T';
+
+  if (limit !== null && (!Number.isInteger(limit) || limit < 1)) {
+    showMessage('दैनिक टोकन सीमा 1 या उससे अधिक पूर्ण संख्या होनी चाहिए।','error');
+    return;
+  }
+
+  if (!/^[A-Z0-9]{1,5}$/.test(prefix)) {
+    showMessage('टोकन Prefix में केवल 1 से 5 अंग्रेजी अक्षर या अंक रखें।','error');
+    return;
+  }
+
+  const button = $('saveBtn');
+  button.disabled = true;
+  button.textContent = 'सेव हो रहा है...';
+
+  try {
+    const settingsPayload = {
+      shop_id: currentShop.id,
+      is_open: $('isOpen').checked,
+      booking_enabled: $('bookingEnabled').checked,
+      show_prices_to_customers: $('showPrices').checked,
+      daily_token_limit: limit,
+      token_prefix: prefix
+    };
+
+    const {error:settingsError} = await db
+      .from('shop_settings')
+      .upsert(settingsPayload,{onConflict:'shop_id'});
+
+    if (settingsError) throw settingsError;
+
+    const hourRows = [];
+
+    document.querySelectorAll('.day').forEach(row => {
+      const day = Number(row.dataset.day);
+      const isClosed = row.querySelector('.isClosed').checked;
+      const openTime = row.querySelector('.openTime').value;
+      const closeTime = row.querySelector('.closeTime').value;
+
+      if (!isClosed) {
+        if (!openTime || !closeTime || openTime >= closeTime) {
+          throw new Error(dayNames[day] + ': खुलने और बंद होने का सही समय चुनें।');
+        }
+      }
+
+      hourRows.push({
+        shop_id: currentShop.id,
+        day_of_week: day,
+        is_closed: isClosed,
+        open_time: isClosed ? null : openTime,
+        close_time: isClosed ? null : closeTime
+      });
+    });
+
+    const {error:hoursError} = await db
+      .from('shop_hours')
+      .upsert(hourRows,{onConflict:'shop_id,day_of_week'});
+
+    if (hoursError) throw hoursError;
+
+    showMessage('सफलता! दुकान की सभी सेटिंग सेव हो गई हैं।');
+  } catch(error) {
+    showMessage('सेटिंग सेव नहीं हुई: '+(error.message || 'अज्ञात त्रुटि'),'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'सभी सेटिंग सेव करें';
+  }
+}
+
+$('shopSelect').addEventListener('change',loadSelectedShop);
+$('saveBtn').addEventListener('click',saveSettings);
+
+loadShops();
+})();
+</script>
+</body>
+</html>
