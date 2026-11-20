@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP TOKEN - Services Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#172554;color:white;padding:18px 20px}
+header h2{margin:0;font-size:22px}
+header p{margin:6px 0 0;color:#dbeafe;font-size:14px}
+main{max-width:850px;margin:25px auto;padding:0 14px}
+.card{background:white;padding:20px;border-radius:14px;margin-bottom:18px;box-shadow:0 3px 15px #0000000b}
+h3{margin:0 0 15px;font-size:18px}
+label{display:block;font-size:14px;font-weight:600;margin:13px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:8px;font-size:15px;background:white}
+button{border:0;border-radius:8px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer}
+.primary{background:#2563eb;color:white}
+.secondary{background:#e5e7eb;color:#172033}
+.danger{background:#fee2e2;color:#991b1b}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row>*{flex:1}
+.service{border:1px solid #e5e7eb;padding:14px;border-radius:10px;margin-top:12px}
+.service h4{margin:0 0 7px}
+.muted{color:#64748b;font-size:13px}
+.message{padding:12px;border-radius:8px;margin:12px 0;display:none;font-size:14px}
+.error{background:#fee2e2;color:#991b1b}
+.success{background:#dcfce7;color:#166534}
+.switchline{display:flex;justify-content:space-between;gap:15px;align-items:center}
+.switchline input{width:22px;height:22px}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+#loading{text-align:center;padding:25px;color:#64748b}
+@media(max-width:520px){.row{display:block}.row>*{margin-bottom:8px}.card{padding:16px}}
+</style>
+</head>
+<body>
+
+<header>
+<h2>RP TOKEN</h2>
+<p>दुकान की सेवाएँ प्रबंधित करें</p>
+</header>
+
+<main>
+<div class="card">
+<h3>अपनी दुकान चुनें</h3>
+<select id="shopSelect">
+<option value="">दुकान लोड हो रही है...</option>
+</select>
+<p class="muted">आपकी सेवाएँ चुनी गई दुकान के अनुसार दिखाई देंगी।</p>
+</div>
+
+<div id="message" class="message"></div>
+<div id="loading">कृपया प्रतीक्षा करें...</div>
+
+<section id="app" style="display:none">
+
+<div class="card">
+<h3>ग्राहकों को कीमत दिखाने की सेटिंग</h3>
+<div class="switchline">
+<div>
+<strong>कीमत सार्वजनिक करें</strong>
+<p class="muted">ON करने पर ग्राहक QR पेज पर सेवा की कीमत देख सकेंगे। OFF करने पर कीमत छिपी रहेगी।</p>
+</div>
+<input type="checkbox" id="showPrices">
+</div>
+<p class="muted" id="priceSettingStatus">सेटिंग लोड हो रही है...</p>
+</div>
+
+<div class="card">
+<h3 id="formHeading">नई सेवा जोड़ें</h3>
+
+<label for="serviceName">सेवा का नाम *</label>
+<input id="serviceName" type="text" placeholder="जैसे Hair Cut">
+
+<div class="row">
+<div>
+<label for="duration">समय (मिनट) *</label>
+<input id="duration" type="number" min="1" max="600" value="20">
+</div>
+<div>
+<label for="price">कीमत (वैकल्पिक ₹)</label>
+<input id="price" type="number" min="0" step="0.01" placeholder="खाली छोड़ सकते हैं">
+</div>
+</div>
+
+<div class="actions">
+<button class="primary" id="saveService">सेवा जोड़ें</button>
+<button class="secondary" id="cancelEdit" style="display:none">रद्द करें</button>
+</div>
+</div>
+
+<div class="card">
+<h3>मेरी सेवाएँ</h3>
+<p class="muted">यहाँ आप सेवाओं को सक्रिय, निष्क्रिय या संपादित कर सकते हैं।</p>
+<div id="serviceList">सेवाएँ लोड हो रही हैं...</div>
+</div>
+
+</section>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.supabaseClient;
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let currentShop = null;
+let editingId = null;
+let services = [];
+let busy = false;
+
+function message(text, type="success") {
+    const box = $("message");
+    box.textContent = text;
+    box.className = "message " + type;
+    box.style.display = "block";
+    window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function clearMessage() {
+    $("message").style.display = "none";
+}
+
+function setBusy(value) {
+    busy = value;
+    $("saveService").disabled = value;
+    $("showPrices").disabled = value;
+}
+
+async function init() {
+    if (!db) {
+        $("loading").textContent = "Supabase कनेक्शन नहीं मिला। config.js जाँचें।";
+        return;
+    }
+
+    const {data:{session},error} = await db.auth.getSession();
+
+    if (error || !session) {
+        location.href = "index.html";
+        return;
+    }
+
+    currentUser = session.user;
+
+    const {data:shops,error:shopError} = await db
+        .from("shops")
+        .select("id,name")
+        .order("created_at",{ascending:false});
+
+    if (shopError) {
+        $("loading").textContent = "दुकान लोड नहीं हुई: " + shopError.message;
+        return;
+    }
+
+    $("shopSelect").innerHTML = "";
+
+    if (!shops || shops.length === 0) {
+        $("loading").textContent = "आपकी कोई दुकान नहीं मिली। पहले Dashboard पर दुकान बनाएँ।";
+        return;
+    }
+
+    shops.forEach(shop => {
+        const option = document.createElement("option");
+        option.value = shop.id;
+        option.textContent = shop.name;
+        $("shopSelect").appendChild(option);
+    });
+
+    $("loading").style.display = "none";
+    $("app").style.display = "block";
+
+    $("shopSelect").addEventListener("change", loadShopData);
+    $("showPrices").addEventListener("change", savePriceSetting);
+    $("saveService").addEventListener("click", saveService);
+    $("cancelEdit").addEventListener("click", resetForm);
+
+    await loadShopData();
+}
+
+async function loadShopData() {
+    clearMessage();
+    currentShop = $("shopSelect").value;
+
+    if (!currentShop) return;
+
+    resetForm();
+
+    $("serviceList").textContent = "सेवाएँ लोड हो रही हैं...";
+    $("showPrices").disabled = true;
+
+    const settingsResult = await db
+        .from("shop_settings")
+        .select("show_prices_to_customers")
+        .eq("shop_id",currentShop)
+        .maybeSingle();
+
+    if (settingsResult.error) {
+        message("कीमत सेटिंग लोड नहीं हुई: " + settingsResult.error.message,"error");
+        $("priceSettingStatus").textContent = "सेटिंग लोड नहीं हो सकी।";
+    } else {
+        $("showPrices").checked =
+            settingsResult.data?.show_prices_to_customers === true;
+
+        $("priceSettingStatus").textContent =
+            $("showPrices").checked
+            ? "कीमत ग्राहकों को दिखाई जाएगी।"
+            : "कीमत ग्राहकों से छिपी रहेगी।";
+    }
+
+    $("showPrices").disabled = false;
+
+    const result = await db
+        .from("services")
+        .select("id,name,duration_minutes,price,is_active,created_at")
+        .eq("shop_id",currentShop)
+        .order("created_at",{ascending:false});
+
+    if (result.error) {
+        $("serviceList").textContent = "सेवाएँ लोड नहीं हुईं: " + result.error.message;
+        return;
+    }
+
+    services = result.data || [];
+    renderServices();
+}
+
+async function savePriceSetting() {
+    if (!currentShop || busy) return;
+
+    clearMessage();
+    setBusy(true);
+
+    const value = $("showPrices").checked;
+
+    const {error} = await db
+        .from("shop_settings")
+        .upsert({
+            shop_id: currentShop,
+            show_prices_to_customers: value
+        },{onConflict:"shop_id"});
+
+    setBusy(false);
+
+    if (error) {
+        $("showPrices").checked = !value;
+        message("सेटिंग सेव नहीं हुई: " + error.message,"error");
+        return;
+    }
+
+    $("priceSettingStatus").textContent = value
+        ? "कीमत ग्राहकों को दिखाई जाएगी।"
+        : "कीमत ग्राहकों से छिपी रहेगी।";
+
+    message("कीमत दिखाने की सेटिंग सेव हो गई।");
+}
+
+async function saveService() {
+    if (busy || !currentShop) return;
+
+    clearMessage();
+
+    const name = $("serviceName").value.trim();
+    const duration = Number($("duration").value);
+    const priceText = $("price").value.trim();
+
+    if (!name) {
+        message("कृपया सेवा का नाम लिखें।","error");
+        return;
+    }
+
+    if (!Number.isInteger(duration) || duration < 1 || duration > 600) {
+        message("समय 1 से 600 मिनट के बीच दर्ज करें।","error");
+        return;
+    }
+
+    let price = null;
+
+    if (priceText !== "") {
+        price = Number(priceText);
+
+        if (!Number.isFinite(price) || price < 0) {
+            message("कृपया सही कीमत दर्ज करें।","error");
+            return;
+        }
+    }
+
+    const payload = {
+        shop_id: currentShop,
+        name,
+        duration_minutes: duration,
+        price
+    };
+
+    setBusy(true);
+
+    let result;
+
+    if (editingId) {
+        result = await db
+            .from("services")
+            .update(payload)
+            .eq("id",editingId)
+            .eq("shop_id",currentShop);
+    } else {
+        result = await db
+            .from("services")
+            .insert(payload);
+    }
+
+    setBusy(false);
+
+    if (result.error) {
+        message("सेवा सेव नहीं हुई: " + result.error.message,"error");
+        return;
+    }
+
+    message(editingId ? "सेवा अपडेट हो गई।" : "नई सेवा जोड़ दी गई।");
+    resetForm();
+    await loadShopData();
+}
+
+function renderServices() {
+    const list = $("serviceList");
+    list.innerHTML = "";
+
+    if (services.length === 0) {
+        list.textContent = "अभी कोई सेवा नहीं जोड़ी गई है।";
+        return;
+    }
+
+    services.forEach(service => {
+        const card = document.createElement("div");
+        card.className = "service";
+
+        const heading = document.createElement("h4");
+        heading.textContent = service.name;
+
+        const details = document.createElement("p");
+        details.className = "muted";
+        details.textContent =
+            service.duration_minutes + " मिनट • " +
+            (service.price === null || service.price === undefined
+                ? "कीमत दर्ज नहीं"
+                : "₹" + Number(service.price).toFixed(2)) +
+            " • " + (service.is_active ? "सक्रिय" : "निष्क्रिय");
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const edit = document.createElement("button");
+        edit.className = "secondary";
+        edit.textContent = "संपादित करें";
+        edit.addEventListener("click",() => editService(service));
+
+        const toggle = document.createElement("button");
+        toggle.className = service.is_active ? "danger" : "primary";
+        toggle.textContent = service.is_active ? "निष्क्रिय करें" : "सक्रिय करें";
+        toggle.addEventListener("click",() => toggleService(service));
+
+        actions.append(edit,toggle);
+        card.append(heading,details,actions);
+        list.appendChild(card);
+    });
+}
+
+function editService(service) {
+    editingId = service.id;
+    $("formHeading").textContent = "सेवा संपादित करें";
+    $("serviceName").value = service.name;
+    $("duration").value = service.duration_minutes;
+    $("price").value = service.price ?? "";
+    $("saveService").textContent = "बदलाव सेव करें";
+    $("cancelEdit").style.display = "inline-block";
+    $("serviceName").focus();
+}
+
+function resetForm() {
+    editingId = null;
+    $("formHeading").textContent = "नई सेवा जोड़ें";
+    $("serviceName").value = "";
+    $("duration").value = 20;
+    $("price").value = "";
+    $("saveService").textContent = "सेवा जोड़ें";
+    $("cancelEdit").style.display = "none";
+}
+
+async function toggleService(service) {
+    if (busy) return;
+
+    const nextStatus = !service.is_active;
+    setBusy(true);
+
+    const {error} = await db
+        .from("services")
+        .update({is_active:nextStatus})
+        .eq("id",service.id)
+        .eq("shop_id",currentShop);
+
+    setBusy(false);
+
+    if (error) {
+        message("सेवा की स्थिति नहीं बदली: " + error.message,"error");
+        return;
+    }
+
+    message(nextStatus ? "सेवा सक्रिय कर दी गई।" : "सेवा निष्क्रिय कर दी गई।");
+    await loadShopData();
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
