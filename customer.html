@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RP TOKEN - अपना टोकन लें</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#172554;color:white;text-align:center;padding:22px 15px}
+header h1{margin:0;font-size:25px}
+header p{margin:7px 0 0;color:#cbd5e1}
+main{max-width:520px;margin:25px auto;padding:0 14px}
+.card{background:white;padding:22px;border-radius:15px;box-shadow:0 4px 18px #0000000c;margin-bottom:17px}
+h2{font-size:21px;margin:0 0 8px}
+.muted{color:#64748b;font-size:14px;line-height:1.5}
+label{display:block;font-weight:600;font-size:14px;margin:16px 0 7px}
+input,select{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:9px;font-size:16px;background:white}
+button{width:100%;padding:14px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:700;margin-top:18px;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.message{padding:12px;border-radius:9px;margin:12px 0;font-size:14px;display:none}
+.error{background:#fee2e2;color:#991b1b}
+.success{background:#dcfce7;color:#166534}
+.service-price{color:#047857;font-weight:700}
+.token-box{text-align:center;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:20px;margin-top:16px}
+.token-code{font-size:38px;font-weight:800;color:#1d4ed8;margin:12px 0}
+.token-box p{margin:7px 0}
+.small{font-size:12px;color:#64748b;word-break:break-all}
+footer{text-align:center;color:#94a3b8;font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>RP TOKEN</h1>
+<p>अब लाइन में खड़े होने की जरूरत नहीं</p>
+</header>
+
+<main>
+<div class="card" id="shopCard">
+<h2 id="shopName">दुकान लोड हो रही है...</h2>
+<p class="muted" id="shopDescription">कृपया प्रतीक्षा करें।</p>
+</div>
+
+<div class="card" id="formCard" style="display:none">
+<h2>अपना डिजिटल टोकन लें</h2>
+<p class="muted">अपनी जानकारी भरें और टोकन प्राप्त करें।</p>
+
+<div id="message" class="message"></div>
+
+<form id="tokenForm">
+<label for="customerName">आपका नाम *</label>
+<input id="customerName" type="text" maxlength="80" minlength="2"
+placeholder="अपना पूरा नाम लिखें" required>
+
+<label for="customerPhone">मोबाइल नंबर *</label>
+<input id="customerPhone" type="tel" inputmode="numeric"
+maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" required>
+
+<label for="serviceSelect">सेवा चुनें</label>
+<select id="serviceSelect">
+<option value="">कोई विशेष सेवा नहीं</option>
+</select>
+
+<button type="submit" id="submitButton">मेरा टोकन बनाएँ</button>
+</form>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+<h2>आपका टोकन तैयार है!</h2>
+<div class="token-box">
+<p class="muted">आपका टोकन नंबर</p>
+<div class="token-code" id="tokenCode">---</div>
+<p id="resultShop"></p>
+<p id="resultService"></p>
+<p class="muted" id="resultDate"></p>
+</div>
+<p class="muted">कृपया अपना टोकन नंबर सुरक्षित रखें। अगले चरण में इसी टोकन से आप अपनी लाइव स्थिति देख सकेंगे।</p>
+<p class="small" id="accessKeyText"></p>
+</div>
+</main>
+
+<footer>RP TOKEN — Smart Queue Management Platform</footer>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.supabaseClient;
+const $ = id => document.getElementById(id);
+
+const params = new URLSearchParams(window.location.search);
+const shopSlug = (params.get("shop") || "").trim().toLowerCase();
+
+let shopInfo = null;
+let submitting = false;
+
+function showMessage(text,type="error") {
+    const box = $("message");
+    box.textContent = text;
+    box.className = "message " + type;
+    box.style.display = "block";
+}
+
+function hideMessage() {
+    $("message").style.display = "none";
+}
+
+function fail(text) {
+    $("shopName").textContent = "दुकान उपलब्ध नहीं है";
+    $("shopDescription").textContent = text;
+}
+
+async function loadShop() {
+    if (!db) {
+        fail("Supabase कनेक्शन नहीं मिला।");
+        return;
+    }
+
+    if (!shopSlug) {
+        fail("दुकान का लिंक अधूरा है। कृपया दुकान का सही QR कोड स्कैन करें।");
+        return;
+    }
+
+    const {data,error} = await db.rpc("get_public_shop_info", {
+        p_shop_slug: shopSlug
+    });
+
+    if (error) {
+        fail("दुकान की जानकारी लोड नहीं हुई: " + error.message);
+        return;
+    }
+
+    if (!data || data.success !== true) {
+        fail(data?.message || "दुकान नहीं मिली।");
+        return;
+    }
+
+    shopInfo = data;
+    $("shopName").textContent = data.shop_name;
+    $("shopDescription").textContent = "अपनी सेवा चुनें और डिजिटल टोकन प्राप्त करें।";
+
+    const select = $("serviceSelect");
+
+    (data.services || []).forEach(service => {
+        const option = document.createElement("option");
+        option.value = service.id;
+
+        let label = service.name + " (" + service.duration_minutes + " मिनट)";
+
+        if (data.show_prices && service.price !== null && service.price !== undefined) {
+            label += " - ₹" + Number(service.price).toFixed(2);
+        }
+
+        option.textContent = label;
+        select.appendChild(option);
+    });
+
+    if (!data.services || data.services.length === 0) {
+        $("shopDescription").textContent =
+            "इस दुकान ने अभी कोई सक्रिय सेवा उपलब्ध नहीं कराई है।";
+    }
+
+    $("formCard").style.display = "block";
+}
+
+$("tokenForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (submitting || !shopInfo) return;
+
+    hideMessage();
+
+    const name = $("customerName").value.trim();
+    const phone = $("customerPhone").value.trim();
+    const serviceId = $("serviceSelect").value || null;
+
+    if (name.length < 2 || name.length > 80) {
+        showMessage("कृपया 2 से 80 अक्षरों के बीच सही नाम लिखें।");
+        return;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        showMessage("कृपया 10 अंकों का सही मोबाइल नंबर लिखें।");
+        return;
+    }
+
+    submitting = true;
+    $("submitButton").disabled = true;
+    $("submitButton").textContent = "टोकन बनाया जा रहा है...";
+
+    try {
+        const {data,error} = await db.rpc("create_queue_token", {
+            p_shop_slug: shopSlug,
+            p_customer_name: name,
+            p_customer_phone: phone,
+            p_service_id: serviceId
+        });
+
+        if (error) throw error;
+
+        if (!data || data.success !== true) {
+            throw new Error(data?.message || "टोकन नहीं बन पाया।");
+        }
+
+        $("formCard").style.display = "none";
+        $("resultCard").style.display = "block";
+
+        $("tokenCode").textContent = data.token_code;
+        $("resultShop").textContent = data.shop_name;
+
+        const selected = (shopInfo.services || []).find(s => s.id === serviceId);
+        $("resultService").textContent = selected
+            ? "सेवा: " + selected.name
+            : "सेवा: कोई विशेष सेवा नहीं चुनी गई";
+
+        $("resultDate").textContent = "तारीख: " + data.queue_date;
+        $("accessKeyText").textContent =
+            "आपकी निजी टोकन पहचान: " + data.access_key;
+
+        window.scrollTo({top:0,behavior:"smooth"});
+
+    } catch (error) {
+        showMessage(error.message || "टोकन बनाते समय समस्या आई।");
+        submitting = false;
+        $("submitButton").disabled = false;
+        $("submitButton").textContent = "मेरा टोकन बनाएँ";
+    }
+});
+
+loadShop();
+
+})();
+</script>
+</body>
+</html>
