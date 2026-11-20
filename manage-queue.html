@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RP TOKEN - Queue Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#172554;color:white;padding:18px 16px}
+header h2{margin:0;font-size:22px}
+header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:950px;margin:22px auto;padding:0 14px}
+.card{background:white;border-radius:14px;padding:17px;margin-bottom:16px;box-shadow:0 3px 14px #0000000b}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+select{width:100%;padding:12px;border:1px solid #d8deea;border-radius:9px;font-size:15px;background:white}
+button{border:0;border-radius:9px;padding:10px 14px;font-size:13px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:#2563eb;color:white}
+.green{background:#15803d;color:white}
+.orange{background:#ea580c;color:white}
+.red{background:#dc2626;color:white}
+.gray{background:#e2e8f0;color:#172033}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f8fafc;border:1px solid #e5eaf2;border-radius:11px;padding:14px;text-align:center}
+.stat strong{display:block;font-size:25px;margin-bottom:5px}
+.stat span{font-size:12px;color:#64748b}
+.token{border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:11px}
+.token-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.token-code{font-size:21px;font-weight:bold;color:#1d4ed8}
+.customer{font-size:15px;font-weight:bold;margin-top:9px}
+.meta{font-size:12px;color:#64748b;margin-top:6px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.badge{font-size:11px;padding:5px 9px;border-radius:20px;background:#e2e8f0}
+.waiting{background:#fef3c7;color:#92400e}
+.called{background:#dbeafe;color:#1e40af}
+.serving{background:#dcfce7;color:#166534}
+.completed{background:#e0e7ff;color:#3730a3}
+.cancelled,.skipped{background:#fee2e2;color:#991b1b}
+.section-title{font-size:17px;margin:0 0 12px}
+.notice{padding:12px;border-radius:9px;background:#eff6ff;color:#1e40af;font-size:13px}
+.error{background:#fef2f2;color:#b91c1c}
+.empty{text-align:center;color:#64748b;padding:25px 10px}
+.small{font-size:12px;color:#64748b}
+@media(max-width:500px){
+.stats{gap:6px}.stat{padding:11px 5px}
+.stat strong{font-size:21px}
+.token-top{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h2>RP TOKEN</h2>
+<p>Shop Queue Management Dashboard</p>
+</header>
+
+<main>
+<div class="card">
+<label for="shopSelect">अपनी दुकान चुनें</label>
+<select id="shopSelect">
+<option value="">दुकान लोड हो रही है...</option>
+</select>
+<p class="small" id="shopInfo"></p>
+</div>
+
+<div class="card">
+<div class="stats">
+<div class="stat">
+<strong id="waitingCount">0</strong>
+<span>Waiting</span>
+</div>
+<div class="stat">
+<strong id="calledCount">0</strong>
+<span>Called</span>
+</div>
+<div class="stat">
+<strong id="servingCount">0</strong>
+<span>Serving</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<button class="primary" id="callNextBtn" style="width:100%;padding:14px;font-size:16px">
+📢 CALL NEXT TOKEN
+</button>
+<p class="small" id="callMessage"></p>
+</div>
+
+<div class="card">
+<h3 class="section-title">🔔 वर्तमान कतार</h3>
+<div id="queueList">
+<div class="empty">कतार लोड हो रही है...</div>
+</div>
+</div>
+
+<div class="card">
+<h3 class="section-title">✅ आज पूरे हुए / बंद टोकन</h3>
+<div id="finishedList">
+<div class="empty">लोड हो रहा है...</div>
+</div>
+</div>
+
+<div class="small" style="text-align:center;padding:10px">
+हर 5 सेकंड में Queue अपने-आप अपडेट होती है।
+<br><span id="lastUpdated"></span>
+</div>
+<div id="message" class="notice" style="display:none;margin-bottom:20px"></div>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.supabaseClient;
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let shops = [];
+let currentShop = null;
+let tokens = [];
+let refreshing = false;
+
+if (!db) {
+    showMessage("Supabase कनेक्शन नहीं मिला। config.js जाँचें।", true);
+    return;
+}
+
+function showMessage(message, error=false) {
+    const box = $("message");
+    box.textContent = message;
+    box.className = error ? "notice error" : "notice";
+    box.style.display = "block";
+}
+
+function hideMessage() {
+    $("message").style.display = "none";
+}
+
+function escapeText(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+    })[char]);
+}
+
+function todayInTimezone(timezone) {
+    try {
+        return new Intl.DateTimeFormat("en-CA", {
+            timeZone: timezone || "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).format(new Date());
+    } catch {
+        return new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).format(new Date());
+    }
+}
+
+function timeText(value) {
+    if (!value) return "";
+    return new Date(value).toLocaleTimeString("hi-IN", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function statusText(status) {
+    const map = {
+        waiting: "प्रतीक्षा में",
+        called: "बुलाया गया",
+        serving: "सेवा जारी",
+        completed: "पूरा हुआ",
+        skipped: "छोड़ा गया",
+        cancelled: "रद्द"
+    };
+    return map[status] || status;
+}
+
+function statusClass(status) {
+    return ["waiting","called","serving","completed","cancelled","skipped"].includes(status)
+        ? status : "";
+}
+
+async function initialize() {
+    try {
+        const {data:{session},error} = await db.auth.getSession();
+        if (error) throw error;
+
+        if (!session) {
+            showMessage("पहले Login करें। फिर Queue Dashboard खोलें।", true);
+            $("queueList").innerHTML =
+                '<div class="empty">Login आवश्यक है।</div>';
+            return;
+        }
+
+        currentUser = session.user;
+        await loadShops();
+
+    } catch (error) {
+        showMessage(error.message || "Login जाँचने में समस्या हुई।", true);
+    }
+}
+
+async function loadShops() {
+    const memberResult = await db
+        .from("shop_members")
+        .select("shop_id, role")
+        .eq("user_id", currentUser.id)
+        .eq("is_active", true);
+
+    if (memberResult.error) throw memberResult.error;
+
+    const memberIds = (memberResult.data || []).map(x => x.shop_id);
+
+    const ownerResult = await db
+        .from("shops")
+        .select("id, owner_id, name, slug, timezone, is_active")
+        .eq("owner_id", currentUser.id)
+        .eq("is_active", true);
+
+    if (ownerResult.error) throw ownerResult.error;
+
+    const ids = [...new Set([
+        ...memberIds,
+        ...(ownerResult.data || []).map(x => x.id)
+    ])];
+
+    if (!ids.length) {
+        $("shopSelect").innerHTML = '<option value="">कोई दुकान नहीं मिली</option>';
+        $("queueList").innerHTML =
+            '<div class="empty">आपके खाते से कोई सक्रिय दुकान जुड़ी नहीं है।</div>';
+        return;
+    }
+
+    const {data:shopData,error} = await db
+        .from("shops")
+        .select("id, owner_id, name, slug, timezone, is_active")
+        .in("id", ids)
+        .eq("is_active", true);
+
+    if (error) throw error;
+
+    shops = shopData || [];
+
+    $("shopSelect").innerHTML = '<option value="">दुकान चुनें</option>' +
+        shops.map(shop =>
+            `<option value="${escapeText(shop.id)}">${escapeText(shop.name)}</option>`
+        ).join("");
+
+    if (shops.length === 1) {
+        $("shopSelect").value = shops[0].id;
+        await selectShop();
+    }
+}
+
+async function selectShop() {
+    const shopId = $("shopSelect").value;
+    currentShop = shops.find(s => s.id === shopId) || null;
+
+    if (!currentShop) return;
+
+    $("shopInfo").textContent = "दुकान: " + currentShop.name;
+    hideMessage();
+    await loadQueue();
+}
+
+async function loadQueue() {
+    if (!currentShop || refreshing) return;
+    refreshing = true;
+
+    try {
+        const today = todayInTimezone(currentShop.timezone);
+
+        const {data,error} = await db
+            .from("queue_tokens")
+            .select("id, token_number, token_code, customer_name, status, created_at, called_at, service_id")
+            .eq("shop_id", currentShop.id)
+            .eq("queue_date", today)
+            .order("token_number", {ascending:true});
+
+        if (error) throw error;
+
+        tokens = data || [];
+        renderQueue();
+        $("lastUpdated").textContent =
+            "अंतिम अपडेट: " + new Date().toLocaleTimeString("hi-IN");
+
+    } catch (error) {
+        showMessage("Queue लोड नहीं हुई: " + error.message, true);
+    } finally {
+        refreshing = false;
+    }
+}
+
+function renderQueue() {
+    const waiting = tokens.filter(t => t.status === "waiting");
+    const called = tokens.filter(t => t.status === "called");
+    const serving = tokens.filter(t => t.status === "serving");
+
+    $("waitingCount").textContent = waiting.length;
+    $("calledCount").textContent = called.length;
+    $("servingCount").textContent = serving.length;
+
+    const active = tokens.filter(t =>
+        ["waiting","called","serving"].includes(t.status)
+    );
+
+    if (!active.length) {
+        $("queueList").innerHTML =
+            '<div class="empty">अभी कोई सक्रिय टोकन नहीं है।</div>';
+    } else {
+        $("queueList").innerHTML = active.map(t => tokenCard(t)).join("");
+    }
+
+    const finished = tokens.filter(t =>
+        ["completed","cancelled","skipped"].includes(t.status)
+    ).reverse();
+
+    $("finishedList").innerHTML = finished.length
+        ? finished.map(t => tokenCard(t, true)).join("")
+        : '<div class="empty">अभी कोई पूरा या बंद टोकन नहीं है।</div>';
+}
+
+function tokenCard(t, finished=false) {
+    let buttons = "";
+
+    if (!finished) {
+        if (t.status === "called") {
+            buttons += `<button class="green" onclick="changeStatus('${t.id}','serving')">▶ Serving</button>`;
+        }
+
+        if (t.status === "serving") {
+            buttons += `<button class="green" onclick="changeStatus('${t.id}','completed')">✓ Completed</button>`;
+        }
+
+        if (["waiting","called","serving"].includes(t.status)) {
+            buttons += `<button class="orange" onclick="changeStatus('${t.id}','skipped')">Skip</button>`;
+            buttons += `<button class="red" onclick="changeStatus('${t.id}','cancelled')">Cancel</button>`;
+        }
+    }
+
+    return `
+    <div class="token">
+        <div class="token-top">
+            <span class="token-code">${escapeText(t.token_code)}</span>
+            <span class="badge ${statusClass(t.status)}">${escapeText(statusText(t.status))}</span>
+        </div>
+        <div class="customer">${escapeText(t.customer_name)}</div>
+        <div class="meta">
+            टोकन नंबर: ${escapeText(t.token_number)}
+            ${t.created_at ? " | समय: " + escapeText(timeText(t.created_at)) : ""}
+        </div>
+        <div class="actions">${buttons}</div>
+    </div>`;
+}
+
+async function callNext() {
+    if (!currentShop) {
+        showMessage("पहले दुकान चुनें।", true);
+        return;
+    }
+
+    const button = $("callNextBtn");
+    button.disabled = true;
+    button.textContent = "कृपया प्रतीक्षा करें...";
+
+    try {
+        const {data,error} = await db.rpc("call_next_token", {
+            p_shop_id: currentShop.id
+        });
+
+        if (error) throw error;
+
+        if (!data || !data.success) {
+            $("callMessage").textContent =
+                data?.message || "कोई Waiting टोकन नहीं है।";
+        } else {
+            $("callMessage").textContent =
+                "टोकन " + data.token_code + " बुलाया गया। ग्राहक: " + data.customer_name;
+        }
+
+        await loadQueue();
+
+    } catch (error) {
+        showMessage("Call Next में समस्या: " + error.message, true);
+    } finally {
+        button.disabled = false;
+        button.textContent = "📢 CALL NEXT TOKEN";
+    }
+}
+
+window.changeStatus = async function(tokenId,newStatus) {
+    if (!currentShop) return;
+
+    const token = tokens.find(t => t.id === tokenId);
+    if (!token) return;
+
+    const label = statusText(newStatus);
+    if (!confirm("क्या आप इस टोकन की स्थिति '" + label + "' करना चाहते हैं?")) {
+        return;
+    }
+
+    try {
+        const {data,error} = await db.rpc("update_queue_token_status", {
+            p_shop_id: currentShop.id,
+            p_token_id: tokenId,
+            p_new_status: newStatus
+        });
+
+        if (error) throw error;
+        if (data && data.success === false) {
+            throw new Error(data.message || "स्थिति अपडेट नहीं हुई।");
+        }
+
+        hideMessage();
+        await loadQueue();
+
+    } catch (error) {
+        showMessage("स्थिति अपडेट नहीं हुई: " + error.message, true);
+    }
+};
+
+$("shopSelect").addEventListener("change", selectShop);
+$("callNextBtn").addEventListener("click", callNext);
+
+initialize();
+
+setInterval(() => {
+    if (currentShop) loadQueue();
+}, 5000);
+
+})();
+</script>
+</body>
+</html>
