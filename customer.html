@@ -131,6 +131,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
   <p style="color:#64748b">आपका टोकन सफलतापूर्वक बन गया है!</p>
   <div class="token-number" id="tokenCode"></div>
  <p id="resultService"></p>
+  <p id="resultDate" class="hint"></p>
 <p id="resultTime" class="hint"></p>
   <a id="statusLink" class="status-link" href="#">अपना Live Token Status देखें</a>
   <p class="hint">इस लिंक को सुरक्षित रखें। इससे आप अपनी बारी की स्थिति देख सकते हैं।</p>
@@ -304,19 +305,19 @@ $("resultService").textContent="सेवा: "+(service?.name || "");
 
 // Display token booking date from Supabase
 const queueDate = data.queue_date;
+const resultDateEl = $("resultDate");
 
-if(queueDate){
- const [year,month,day] = queueDate.split("-").map(Number);
- const date = new Date(year,month-1,day);
+if (queueDate && resultDateEl) {
+  const [year, month, day] = queueDate.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
 
- $("resultDate").textContent =
-  "दिनांक: "+date.toLocaleDateString("hi-IN",{
-   day:"numeric",
-   month:"long",
-   year:"numeric"
-  });
+  resultDateEl.textContent =
+    "दिनांक: " + date.toLocaleDateString("hi-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
 }
-
 $("resultTime").textContent=
    "टोकन समय: "+new Date().toLocaleTimeString("hi-IN",{
     hour:"2-digit",minute:"2-digit"
