@@ -231,6 +231,26 @@ input::placeholder{color:#a0aec0}
 }
 .hidden{display:none!important}
 
+
+/* SHOP ACTIONS + EDIT MODAL */
+.shop-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.shop-action{border:0;border-radius:8px;padding:8px 11px;font-size:11px;font-weight:800}
+.shop-edit{background:#eff6ff;color:#1d4ed8}
+.shop-deactivate{background:#fff1f2;color:#be123c}
+.shop-inactive{display:inline-block;margin-top:8px;background:#fff7ed;color:#9a3412;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.modal-backdrop{position:fixed;inset:0;background:#0f172acc;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal-backdrop.show{display:flex}
+.edit-modal{width:min(620px,100%);max-height:90vh;overflow:auto;background:white;border-radius:16px;padding:22px;box-shadow:0 20px 60px #0004}
+.edit-modal h3{font-size:18px;margin-bottom:6px}
+.edit-modal p{font-size:11px;color:#718096;margin-bottom:18px}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edit-grid .field{margin:0}
+.modal-actions{display:flex;gap:9px;margin-top:18px}
+.modal-actions button{flex:1;border:0;border-radius:9px;padding:12px;font-weight:800}
+.modal-save{background:#2563eb;color:white}
+.modal-cancel{background:#e2e8f0;color:#172033}
+@media(max-width:520px){.edit-grid{grid-template-columns:1fr}}
+
 /* MOBILE */
 .mobile-brand{display:none}
 @media(max-width:900px){
@@ -401,6 +421,30 @@ input::placeholder{color:#a0aec0}
 
  </div>
 
+
+<div class="modal-backdrop" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+ <div class="edit-modal">
+  <h3 id="editTitle">दुकान की जानकारी संपादित करें</h3>
+  <p>बदलाव केवल चुनी गई दुकान पर लागू होंगे।</p>
+  <form id="editShopForm">
+   <input type="hidden" id="editShopId">
+   <div class="edit-grid">
+    <div class="field"><label for="editName">दुकान का नाम *</label><input id="editName" maxlength="100" required></div>
+    <div class="field"><label for="editSlug">दुकान URL *</label><input id="editSlug" minlength="3" maxlength="40" pattern="[a-z0-9-]{3,40}" required></div>
+    <div class="field"><label for="editType">व्यवसाय का प्रकार</label><select id="editType">
+      <option value="other">अन्य व्यवसाय</option><option value="barber">Barber / Hair Salon</option><option value="salon">Beauty Salon / Spa</option><option value="clinic">Clinic / Doctor</option><option value="hospital">Hospital</option><option value="garage">Garage / Workshop</option><option value="service_center">Service Center</option><option value="restaurant">Restaurant / Cafe</option><option value="retail">Retail Shop</option><option value="office">Office / Consultancy</option>
+    </select></div>
+    <div class="field"><label for="editPhone">फोन</label><input id="editPhone" maxlength="20"></div>
+    <div class="field"><label for="editCity">शहर / कस्बा</label><input id="editCity" maxlength="80"></div>
+    <div class="field"><label for="editState">राज्य</label><input id="editState" maxlength="80"></div>
+    <div class="field" style="grid-column:1/-1"><label for="editAddress">पूरा पता</label><input id="editAddress" maxlength="250"></div>
+    <div class="field" style="grid-column:1/-1"><label for="editDescription">दुकान का विवरण</label><input id="editDescription" maxlength="500"></div>
+   </div>
+   <div class="modal-actions"><button type="button" class="modal-cancel" id="cancelEdit">रद्द करें</button><button type="submit" class="modal-save" id="saveEdit">बदलाव सेव करें</button></div>
+  </form>
+ </div>
+</div>
+
  <div class="footer">
   © 2026 RP TOKEN · Smart Queue Management Platform<br>
   Designed for modern businesses
@@ -464,7 +508,7 @@ async function loadShops() {
  shopList.replaceChildren();
 
  const {data,error}=await db.from("shops")
-  .select("id,name,slug,business_type,city,created_at")
+  .select("id,name,slug,business_type,city,phone,address,state,description,is_active,created_at")
   .order("created_at",{ascending:false});
 
  if(error) {
@@ -506,9 +550,89 @@ async function loadShops() {
   url.className="shop-url";
   url.textContent="URL: "+shop.slug;
 
-  item.append(top,details,url);
+  const actions=document.createElement("div");
+  actions.className="shop-actions";
+  const editBtn=document.createElement("button");
+  editBtn.type="button";
+  editBtn.className="shop-action shop-edit";
+  editBtn.textContent="✎ जानकारी संपादित करें";
+  editBtn.addEventListener("click",()=>openEditShop(shop));
+  actions.appendChild(editBtn);
+
+  if(shop.is_active){
+   const offBtn=document.createElement("button");
+   offBtn.type="button";
+   offBtn.className="shop-action shop-deactivate";
+   offBtn.textContent="दुकान बंद / निष्क्रिय करें";
+   offBtn.addEventListener("click",()=>deactivateShop(shop));
+   actions.appendChild(offBtn);
+  } else {
+   const inactive=document.createElement("span");
+   inactive.className="shop-inactive";
+   inactive.textContent="निष्क्रिय";
+   actions.appendChild(inactive);
+  }
+
+  item.append(top,details,url,actions);
   shopList.appendChild(item);
  });
+}
+
+
+function openEditShop(shop){
+ document.getElementById("editShopId").value=shop.id;
+ document.getElementById("editName").value=shop.name||"";
+ document.getElementById("editSlug").value=shop.slug||"";
+ document.getElementById("editType").value=shop.business_type||"other";
+ document.getElementById("editPhone").value=shop.phone||"";
+ document.getElementById("editCity").value=shop.city||"";
+ document.getElementById("editState").value=shop.state||"";
+ document.getElementById("editAddress").value=shop.address||"";
+ document.getElementById("editDescription").value=shop.description||"";
+ document.getElementById("editModal").classList.add("show");
+}
+function closeEditShop(){
+ document.getElementById("editModal").classList.remove("show");
+}
+document.getElementById("cancelEdit").addEventListener("click",closeEditShop);
+document.getElementById("editModal").addEventListener("click",e=>{
+ if(e.target.id==="editModal") closeEditShop();
+});
+document.getElementById("editShopForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const id=document.getElementById("editShopId").value;
+ const name=document.getElementById("editName").value.trim();
+ const slug=document.getElementById("editSlug").value.trim().toLowerCase();
+ if(name.length<2 || !/^[a-z0-9-]{3,40}$/.test(slug)){
+  showMessage("दुकान का नाम या URL सही नहीं है।","error");return;
+ }
+ const btn=document.getElementById("saveEdit");
+ btn.disabled=true;btn.textContent="सेव हो रहा है...";
+ try{
+  const {error}=await db.from("shops").update({
+   name,slug,
+   business_type:document.getElementById("editType").value,
+   phone:document.getElementById("editPhone").value.trim()||null,
+   city:document.getElementById("editCity").value.trim()||null,
+   state:document.getElementById("editState").value.trim()||null,
+   address:document.getElementById("editAddress").value.trim()||null,
+   description:document.getElementById("editDescription").value.trim()||null
+  }).eq("id",id);
+  if(error) throw error;
+  closeEditShop();showMessage("दुकान की जानकारी सफलतापूर्वक अपडेट हो गई।","success");
+  await loadShops();
+ }catch(err){showMessage("जानकारी अपडेट नहीं हुई: "+(err.message||"त्रुटि"),"error");}
+ finally{btn.disabled=false;btn.textContent="बदलाव सेव करें";}
+});
+async function deactivateShop(shop){
+ const answer=confirm("क्या आप '"+shop.name+"' को निष्क्रिय करना चाहते हैं? इससे दुकान हटेगी नहीं, लेकिन ग्राहक बुकिंग और सामान्य दुकान संचालन बंद हो जाएगा।");
+ if(!answer)return;
+ try{
+  const {error}=await db.from("shops").update({is_active:false}).eq("id",shop.id);
+  if(error) throw error;
+  showMessage("दुकान निष्क्रिय कर दी गई। डेटा स्थायी रूप से डिलीट नहीं किया गया।","success");
+  await loadShops();
+ }catch(err){showMessage("दुकान निष्क्रिय नहीं हुई: "+(err.message||"त्रुटि"),"error");}
 }
 
 form.addEventListener("submit",async event=>{
