@@ -5,85 +5,276 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RP TOKEN - Live Token Status</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="assets/js/config.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f1f5f9;color:#172033;font-family:Arial,sans-serif}
-header{background:#172554;color:white;text-align:center;padding:22px 15px}
-header h1{margin:0;font-size:25px}
-header p{color:#cbd5e1;margin:7px 0 0}
-main{max-width:520px;margin:25px auto;padding:0 14px}
-.card{background:white;border-radius:15px;padding:22px;margin-bottom:17px;box-shadow:0 4px 18px #0000000c}
+
+body{
+ margin:0;
+ background:#f1f5f9;
+ color:#172033;
+ font-family:Arial,sans-serif;
+}
+
+header{
+ background:#172554;
+ color:white;
+ text-align:center;
+ padding:22px 15px;
+}
+
+header h1{
+ margin:0;
+ font-size:25px;
+}
+
+header p{
+ color:#cbd5e1;
+ margin:7px 0 0;
+}
+
+main{
+ max-width:520px;
+ margin:25px auto;
+ padding:0 14px;
+}
+
+.card{
+ background:white;
+ border-radius:15px;
+ padding:22px;
+ margin-bottom:17px;
+ box-shadow:0 4px 18px #0000000c;
+}
+
 .center{text-align:center}
-.muted{color:#64748b;font-size:14px;line-height:1.5}
-.token-code{font-size:42px;font-weight:800;color:#1d4ed8;margin:12px 0}
-.status{display:inline-block;padding:9px 17px;border-radius:30px;font-weight:700;font-size:14px;background:#fef3c7;color:#92400e}
-.status.serving{background:#dbeafe;color:#1d4ed8}
-.status.completed{background:#dcfce7;color:#166534}
-.status.cancelled{background:#fee2e2;color:#991b1b}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
-.stat{background:#f8fafc;border:1px solid #e2e8f0;padding:17px 10px;border-radius:11px;text-align:center}
-.stat strong{display:block;font-size:27px;color:#1d4ed8;margin-bottom:5px}
-.stat span{font-size:13px;color:#64748b}
-.message{padding:13px;border-radius:9px;background:#fee2e2;color:#991b1b;font-size:14px}
-button{width:100%;padding:13px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px}
-footer{text-align:center;color:#94a3b8;font-size:12px;padding:20px}
-#lastUpdated{font-size:12px;color:#94a3b8;text-align:center;margin-top:15px}
+
+.muted{
+ color:#64748b;
+ font-size:14px;
+ line-height:1.5;
+}
+
+.token-code{
+ font-size:42px;
+ font-weight:800;
+ color:#1d4ed8;
+ margin:12px 0;
+}
+
+.status{
+ display:inline-block;
+ padding:9px 17px;
+ border-radius:30px;
+ font-weight:700;
+ font-size:14px;
+ background:#fef3c7;
+ color:#92400e;
+}
+
+.status.serving{
+ background:#dbeafe;
+ color:#1d4ed8;
+}
+
+.status.completed{
+ background:#dcfce7;
+ color:#166534;
+}
+
+.status.cancelled{
+ background:#fee2e2;
+ color:#991b1b;
+}
+
+.stats{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+ margin-top:18px;
+}
+
+.stat{
+ background:#f8fafc;
+ border:1px solid #e2e8f0;
+ padding:17px 10px;
+ border-radius:11px;
+ text-align:center;
+}
+
+.stat strong{
+ display:block;
+ font-size:27px;
+ color:#1d4ed8;
+ margin-bottom:5px;
+}
+
+.stat span{
+ font-size:13px;
+ color:#64748b;
+}
+
+.message{
+ padding:13px;
+ border-radius:9px;
+ background:#fee2e2;
+ color:#991b1b;
+ font-size:14px;
+}
+
+button{
+ width:100%;
+ padding:13px;
+ border:0;
+ border-radius:9px;
+ background:#2563eb;
+ color:white;
+ font-size:15px;
+ font-weight:700;
+ cursor:pointer;
+ margin-top:14px;
+}
+
+button:disabled{
+ opacity:.6;
+ cursor:not-allowed;
+}
+
+.back-button{
+ background:#172554;
+}
+
+.back-button:hover{
+ background:#1e40af;
+}
+
+.refresh-button{
+ background:#2563eb;
+}
+
+footer{
+ text-align:center;
+ color:#94a3b8;
+ font-size:12px;
+ padding:20px;
+}
+
+#lastUpdated{
+ font-size:12px;
+ color:#94a3b8;
+ text-align:center;
+ margin-top:15px;
+}
+
 </style>
 </head>
+
 <body>
 
 <header>
-<h1>RP TOKEN</h1>
-<p>आपकी लाइव कतार स्थिति</p>
+ <h1>RP TOKEN</h1>
+ <p>आपकी लाइव कतार स्थिति</p>
 </header>
 
 <main>
-<div class="card center" id="loadingCard">
-<h2>टोकन की जानकारी लोड हो रही है...</h2>
-<p class="muted">कृपया प्रतीक्षा करें।</p>
-</div>
 
-<div id="errorCard" class="card" style="display:none">
-<h2>टोकन उपलब्ध नहीं है</h2>
-<p class="message" id="errorMessage"></p>
-</div>
+ <!-- LOADING -->
+ <div class="card center" id="loadingCard">
+  <h2>टोकन की जानकारी लोड हो रही है...</h2>
+  <p class="muted">कृपया प्रतीक्षा करें।</p>
+ </div>
 
-<div id="statusCard" style="display:none">
-<div class="card center">
-<p class="muted" id="shopName"></p>
-<p class="muted">आपका टोकन नंबर</p>
-<div class="token-code" id="tokenCode">---</div>
-<span class="status" id="tokenStatus">Waiting</span>
-<p id="serviceName" class="muted"></p>
-</div>
 
-<div class="card">
-<h3>आपकी कतार की स्थिति</h3>
-<div class="stats">
-<div class="stat">
-<strong id="peopleAhead">0</strong>
-<span>आपसे आगे ग्राहक</span>
-</div>
-<div class="stat">
-<strong id="queuePosition">1</strong>
-<span>आपकी कतार स्थिति</span>
-</div>
-</div>
-<p class="muted center" id="statusMessage" style="margin-top:18px"></p>
-<p class="muted center" id="createdAt"></p>
-<p id="lastUpdated"></p>
-</div>
+ <!-- ERROR -->
+ <div id="errorCard" class="card" style="display:none">
 
-<div class="card">
-<p class="muted center">आपकी स्थिति हर 5 सेकंड में अपने आप अपडेट होती है।</p>
-<button id="refreshButton">अभी अपडेट करें</button>
-</div>
-</div>
+  <h2>टोकन उपलब्ध नहीं है</h2>
+
+  <p class="message" id="errorMessage"></p>
+
+  <button class="back-button" id="errorBackButton">
+   ← वापस जाएं
+  </button>
+
+ </div>
+
+
+ <!-- LIVE STATUS -->
+ <div id="statusCard" style="display:none">
+
+  <div class="card center">
+
+   <p class="muted" id="shopName"></p>
+
+   <p class="muted">आपका टोकन नंबर</p>
+
+   <div class="token-code" id="tokenCode">---</div>
+
+   <span class="status" id="tokenStatus">
+    Waiting
+   </span>
+
+   <p id="serviceName" class="muted"></p>
+
+  </div>
+
+
+  <!-- QUEUE INFORMATION -->
+  <div class="card">
+
+   <h3>आपकी कतार की स्थिति</h3>
+
+   <div class="stats">
+
+    <div class="stat">
+     <strong id="peopleAhead">0</strong>
+     <span>आपसे आगे ग्राहक</span>
+    </div>
+
+    <div class="stat">
+     <strong id="queuePosition">1</strong>
+     <span>आपकी कतार स्थिति</span>
+    </div>
+
+   </div>
+
+   <p class="muted center" id="statusMessage" style="margin-top:18px"></p>
+
+   <p class="muted center" id="createdAt"></p>
+
+   <p id="lastUpdated"></p>
+
+  </div>
+
+
+  <!-- BUTTONS -->
+  <div class="card">
+
+   <p class="muted center">
+    आपकी स्थिति हर 5 सेकंड में अपने आप अपडेट होती है।
+   </p>
+
+   <button class="refresh-button" id="refreshButton">
+    ↻ अभी अपडेट करें
+   </button>
+
+   <button class="back-button" id="backButton">
+    ← अपने टोकन पर वापस जाएं
+   </button>
+
+  </div>
+
+ </div>
+
 </main>
 
-<footer>RP TOKEN — Smart Queue Management Platform</footer>
+<footer>
+ RP TOKEN — Smart Queue Management Platform
+</footer>
+
 
 <script>
 (() => {
@@ -98,137 +289,256 @@ const accessKey = params.get("key");
 let timer = null;
 let loading = false;
 
-function showError(text) {
-    $("loadingCard").style.display = "none";
-    $("statusCard").style.display = "none";
-    $("errorCard").style.display = "block";
-    $("errorMessage").textContent = text;
+
+/* BACK TO PREVIOUS TOKEN RECEIPT */
+
+function goBack(){
+
+ // Browser history में पिछला पेज उपलब्ध है तो वहीं जाएं
+ if(window.history.length > 1){
+
+  window.history.back();
+
+ }else{
+
+  // Direct link खोलने पर दुकान का booking page खोलें
+  const savedShop = sessionStorage.getItem("rp_token_last_shop");
+
+  if(savedShop){
+
+   location.href = "customer.html?shop=" + encodeURIComponent(savedShop);
+
+  }else{
+
+   alert("पिछला टोकन पेज उपलब्ध नहीं है। कृपया अपना पुराना टोकन लिंक खोलें।");
+
+  }
+
+ }
+
 }
 
-function statusDetails(status) {
-    const map = {
-        waiting: {
-            label: "कतार में प्रतीक्षा",
-            className: "",
-            message: "कृपया प्रतीक्षा करें। आपकी बारी आने पर दुकानदार आपको बुलाएगा।"
-        },
-        called: {
-            label: "आपको बुलाया गया है",
-            className: "serving",
-            message: "आपकी बारी आ गई है। कृपया दुकानदार के पास पहुँचें।"
-        },
-        serving: {
-            label: "आपकी सेवा चल रही है",
-            className: "serving",
-            message: "आपकी सेवा अभी जारी है।"
-        },
-        completed: {
-            label: "सेवा पूरी हो गई",
-            className: "completed",
-            message: "आपकी सेवा पूरी हो गई है। धन्यवाद!"
-        },
-        cancelled: {
-            label: "टोकन रद्द",
-            className: "cancelled",
-            message: "यह टोकन रद्द कर दिया गया है। अधिक जानकारी के लिए दुकान से संपर्क करें।"
-        }
-    };
 
-    return map[status] || {
-        label: status || "अज्ञात",
-        className: "",
-        message: "स्थिति की जानकारी उपलब्ध है।"
-    };
+/* ERROR */
+
+function showError(text){
+
+ $("loadingCard").style.display = "none";
+
+ $("statusCard").style.display = "none";
+
+ $("errorCard").style.display = "block";
+
+ $("errorMessage").textContent = text;
+
 }
 
-function formatDateTime(value) {
-    if (!value) return "उपलब्ध नहीं";
 
-    const date = new Date(value);
+/* STATUS DETAILS */
 
-    if (Number.isNaN(date.getTime())) return "उपलब्ध नहीं";
+function statusDetails(status){
 
-    return date.toLocaleString("hi-IN", {
-        day:"2-digit",
-        month:"long",
-        year:"numeric",
-        hour:"2-digit",
-        minute:"2-digit",
-        hour12:true
-    });
+ const map = {
+
+  waiting:{
+   label:"कतार में प्रतीक्षा",
+   className:"",
+   message:"कृपया प्रतीक्षा करें। आपकी बारी आने पर दुकानदार आपको बुलाएगा।"
+  },
+
+  called:{
+   label:"आपको बुलाया गया है",
+   className:"serving",
+   message:"आपकी बारी आ गई है। कृपया दुकानदार के पास पहुँचें।"
+  },
+
+  serving:{
+   label:"आपकी सेवा चल रही है",
+   className:"serving",
+   message:"आपकी सेवा अभी जारी है।"
+  },
+
+  completed:{
+   label:"सेवा पूरी हो गई",
+   className:"completed",
+   message:"आपकी सेवा पूरी हो गई है। धन्यवाद!"
+  },
+
+  cancelled:{
+   label:"टोकन रद्द",
+   className:"cancelled",
+   message:"यह टोकन रद्द कर दिया गया है। अधिक जानकारी के लिए दुकान से संपर्क करें।"
+  }
+
+ };
+
+ return map[status] || {
+
+  label:status || "अज्ञात",
+
+  className:"",
+
+  message:"स्थिति की जानकारी उपलब्ध है।"
+
+ };
+
 }
 
-async function loadStatus() {
-    if (loading) return;
-    loading = true;
 
-    if (!db) {
-        loading = false;
-        showError("Supabase कनेक्शन उपलब्ध नहीं है।");
-        return;
-    }
+/* FORMAT DATE */
 
-    if (!accessKey || !/^[0-9a-f-]{36}$/i.test(accessKey)) {
-        loading = false;
-        showError("निजी टोकन लिंक सही नहीं है। कृपया अपना पूरा स्टेटस लिंक खोलें।");
-        return;
-    }
+function formatDateTime(value){
 
-    try {
-        const {data,error} = await db.rpc("get_token_status", {
-            p_access_key: accessKey
-        });
+ if(!value) return "उपलब्ध नहीं";
 
-        if (error) throw error;
-        if (!data || !data.token_code) {
-            throw new Error("टोकन की जानकारी नहीं मिली।");
-        }
+ const date = new Date(value);
 
-        const status = statusDetails(data.status);
-        const ahead = Number(data.people_ahead) || 0;
+ if(Number.isNaN(date.getTime())) return "उपलब्ध नहीं";
 
-        $("loadingCard").style.display = "none";
-        $("errorCard").style.display = "none";
-        $("statusCard").style.display = "block";
+ return date.toLocaleString("hi-IN",{
 
-        $("shopName").textContent = data.shop_name || "";
-        $("tokenCode").textContent = data.token_code;
-        $("tokenStatus").textContent = status.label;
-        $("tokenStatus").className = "status " + status.className;
-        $("serviceName").textContent = data.service_name
-            ? "सेवा: " + data.service_name
-            : "कोई विशेष सेवा नहीं";
+  day:"2-digit",
 
-        $("peopleAhead").textContent = ahead;
-        $("queuePosition").textContent =
-            ["completed","cancelled"].includes(data.status)
-            ? "—"
-            : ahead + 1;
+  month:"long",
 
-        $("statusMessage").textContent = status.message;
-        $("createdAt").textContent =
-            "टोकन बनने का समय: " + formatDateTime(data.created_at);
+  year:"numeric",
 
-        $("lastUpdated").textContent =
-            "अंतिम अपडेट: " + new Date().toLocaleTimeString("hi-IN");
+  hour:"2-digit",
 
-    } catch (error) {
-        showError(error.message || "स्थिति लोड नहीं हो सकी।");
-    } finally {
-        loading = false;
-    }
+  minute:"2-digit",
+
+  hour12:true
+
+ });
+
 }
 
-$("refreshButton").addEventListener("click", loadStatus);
+
+/* LOAD LIVE STATUS */
+
+async function loadStatus(){
+
+ if(loading) return;
+
+ loading = true;
+
+ if(!db){
+
+  loading = false;
+
+  showError("Supabase कनेक्शन उपलब्ध नहीं है।");
+
+  return;
+
+ }
+
+ if(!accessKey || !/^[0-9a-f-]{36}$/i.test(accessKey)){
+
+  loading = false;
+
+  showError("निजी टोकन लिंक सही नहीं है। कृपया अपना पूरा स्टेटस लिंक खोलें।");
+
+  return;
+
+ }
+
+ try{
+
+  const {data,error} = await db.rpc("get_token_status",{
+
+   p_access_key:accessKey
+
+  });
+
+  if(error) throw error;
+
+  if(!data || !data.token_code){
+
+   throw new Error("टोकन की जानकारी नहीं मिली।");
+
+  }
+
+  const status = statusDetails(data.status);
+
+  const ahead = Number(data.people_ahead) || 0;
+
+
+  $("loadingCard").style.display = "none";
+
+  $("errorCard").style.display = "none";
+
+  $("statusCard").style.display = "block";
+
+
+  $("shopName").textContent = data.shop_name || "";
+
+  $("tokenCode").textContent = data.token_code;
+
+  $("tokenStatus").textContent = status.label;
+
+  $("tokenStatus").className = "status " + status.className;
+
+  $("serviceName").textContent = data.service_name
+   ? "सेवा: " + data.service_name
+   : "कोई विशेष सेवा नहीं";
+
+
+  $("peopleAhead").textContent = ahead;
+
+  $("queuePosition").textContent =
+   ["completed","cancelled"].includes(data.status)
+   ? "—"
+   : ahead + 1;
+
+
+  $("statusMessage").textContent = status.message;
+
+  $("createdAt").textContent =
+   "टोकन बनने का समय: " + formatDateTime(data.created_at);
+
+  $("lastUpdated").textContent =
+   "अंतिम अपडेट: " + new Date().toLocaleTimeString("hi-IN");
+
+
+ }catch(error){
+
+  showError(error.message || "स्थिति लोड नहीं हो सकी।");
+
+ }finally{
+
+  loading = false;
+
+ }
+
+}
+
+
+/* BUTTON EVENTS */
+
+$("refreshButton").addEventListener("click",loadStatus);
+
+$("backButton").addEventListener("click",goBack);
+
+$("errorBackButton").addEventListener("click",goBack);
+
+
+/* START */
 
 loadStatus();
-timer = setInterval(loadStatus, 5000);
 
-window.addEventListener("beforeunload", () => {
-    if (timer) clearInterval(timer);
+timer = setInterval(loadStatus,5000);
+
+
+/* CLEANUP */
+
+window.addEventListener("pagehide",()=>{
+
+ if(timer) clearInterval(timer);
+
 });
 
 })();
 </script>
+
 </body>
 </html>
