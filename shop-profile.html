@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Profile | RP TOKEN</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/js/config.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f3f6fc;
+ color:#17233c;
+}
+.topbar{
+ background:linear-gradient(120deg,#101b38,#253d70);
+ color:white;
+ padding:20px 6%;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.brand{font-size:22px;font-weight:800;letter-spacing:1px}
+.topbar a{color:white;text-decoration:none;font-size:14px}
+.container{max-width:760px;margin:35px auto;padding:0 16px}
+.card{
+ background:white;border-radius:18px;padding:28px;
+ box-shadow:0 10px 35px rgba(20,40,80,.08);
+}
+h2{margin:0 0 8px;font-size:25px}
+.sub{color:#71809a;font-size:14px;margin-bottom:25px}
+label{display:block;font-size:14px;font-weight:700;margin:17px 0 8px}
+input,select{
+ width:100%;padding:14px;border:1px solid #dce3ef;
+ border-radius:10px;font-size:15px;outline:none;background:#fff;
+}
+input:focus,select:focus{border-color:#4169e1}
+input[readonly]{background:#f3f5f9;color:#64748b}
+button{
+ border:0;border-radius:10px;padding:14px 20px;
+ font-size:15px;font-weight:700;cursor:pointer;
+}
+.save{
+ width:100%;margin-top:25px;color:white;
+ background:linear-gradient(120deg,#3159d9,#6948d9);
+}
+.save:disabled{opacity:.6;cursor:not-allowed}
+.message{margin-top:16px;padding:12px;border-radius:9px;display:none;font-size:14px}
+.success{background:#e8f8ee;color:#16733b}
+.error{background:#fff0f0;color:#b42318}
+.loading{color:#64748b;text-align:center;padding:20px}
+.footer{text-align:center;color:#8994a8;font-size:12px;margin:25px}
+@media(max-width:600px){
+ .topbar{padding:17px 20px}
+ .container{margin:20px auto}
+ .card{padding:21px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+ <div class="brand">RP TOKEN</div>
+ <a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main class="container">
+ <section class="card">
+  <h2>Shop Profile</h2>
+  <div class="sub">अपनी दुकान की संपर्क और पता संबंधी जानकारी अपडेट करें।</div>
+
+  <div id="loading" class="loading">जानकारी लोड हो रही है...</div>
+
+  <div id="profileForm" style="display:none">
+
+   <label>अपनी दुकान चुनें</label>
+   <select id="shopSelect">
+    <option value="">दुकान चुनें</option>
+   </select>
+
+   <label>दुकान का नाम</label>
+   <input id="shopName" readonly>
+
+   <label>मोबाइल नंबर</label>
+   <input id="phone" type="tel" maxlength="10"
+          placeholder="10 अंकों का मोबाइल नंबर">
+
+   <label>पूरा पता</label>
+   <input id="address" type="text"
+          placeholder="दुकान का पूरा पता">
+
+   <label>शहर</label>
+   <input id="city" type="text" placeholder="शहर का नाम">
+
+   <label>राज्य</label>
+   <input id="state" type="text" placeholder="राज्य का नाम">
+
+   <button class="save" id="saveBtn" onclick="saveProfile()">
+    जानकारी सेव करें
+   </button>
+
+   <div id="message" class="message"></div>
+  </div>
+ </section>
+
+ <div class="footer">© RP TOKEN · Shop Management</div>
+</main>
+
+<script>
+const client = window.supabaseClient;
+
+let currentUser = null;
+let shops = [];
+
+function showMessage(text,type){
+ const box=document.getElementById("message");
+ box.textContent=text;
+ box.className="message "+type;
+ box.style.display="block";
+}
+
+function hideMessage(){
+ document.getElementById("message").style.display="none";
+}
+
+async function init(){
+ try{
+  if(!client) throw new Error("Supabase connection नहीं मिली।");
+
+  const {data:{session},error:sessionError}=await client.auth.getSession();
+
+  if(sessionError) throw sessionError;
+
+  if(!session){
+   window.location.href="index.html";
+   return;
+  }
+
+  currentUser=session.user;
+
+  const {data,error}=await client
+   .from("shops")
+   .select("id,name,address,city,state,phone")
+   .eq("owner_id",currentUser.id)
+   .order("created_at",{ascending:false});
+
+  if(error) throw error;
+
+  shops=data||[];
+
+  if(!shops.length){
+   document.getElementById("loading").textContent=
+    "आपकी कोई दुकान नहीं मिली। पहले Dashboard से दुकान बनाएँ।";
+   return;
+  }
+
+  const select=document.getElementById("shopSelect");
+
+  shops.forEach(shop=>{
+   const option=document.createElement("option");
+   option.value=shop.id;
+   option.textContent=shop.name;
+   select.appendChild(option);
+  });
+
+  document.getElementById("loading").style.display="none";
+  document.getElementById("profileForm").style.display="block";
+
+  select.addEventListener("change",loadSelectedShop);
+  select.value=shops[0].id;
+  loadSelectedShop();
+
+ }catch(error){
+  document.getElementById("loading").textContent=
+   "त्रुटि: "+error.message;
+ }
+}
+
+function loadSelectedShop(){
+ hideMessage();
+
+ const shop=shops.find(s=>s.id===document.getElementById("shopSelect").value);
+ if(!shop) return;
+
+ document.getElementById("shopName").value=shop.name||"";
+ document.getElementById("phone").value=shop.phone||"";
+ document.getElementById("address").value=shop.address||"";
+ document.getElementById("city").value=shop.city||"";
+ document.getElementById("state").value=shop.state||"";
+}
+
+async function saveProfile(){
+ const shopId=document.getElementById("shopSelect").value;
+ const phone=document.getElementById("phone").value.trim();
+ const address=document.getElementById("address").value.trim();
+ const city=document.getElementById("city").value.trim();
+ const state=document.getElementById("state").value.trim();
+ const btn=document.getElementById("saveBtn");
+
+ hideMessage();
+
+ if(!shopId){
+  showMessage("पहले दुकान चुनें।","error");
+  return;
+ }
+
+ if(phone && !/^[0-9]{10}$/.test(phone)){
+  showMessage("कृपया सही 10 अंकों का मोबाइल नंबर डालें।","error");
+  return;
+ }
+
+ btn.disabled=true;
+ btn.textContent="सेव हो रहा है...";
+
+ try{
+  const {data,error}=await client
+   .from("shops")
+   .update({
+    phone:phone||null,
+    address:address||null,
+    city:city||null,
+    state:state||null
+   })
+   .eq("id",shopId)
+   .eq("owner_id",currentUser.id)
+   .select("id,name,address,city,state,phone")
+   .single();
+
+  if(error) throw error;
+
+  const index=shops.findIndex(s=>s.id===shopId);
+  if(index!==-1) shops[index]=data;
+
+  showMessage("दुकान की जानकारी सफलतापूर्वक सेव हो गई।","success");
+
+ }catch(error){
+  showMessage("जानकारी सेव नहीं हुई: "+error.message,"error");
+ }finally{
+  btn.disabled=false;
+  btn.textContent="जानकारी सेव करें";
+ }
+}
+
+init();
+</script>
+
+</body>
+</html>
