@@ -452,27 +452,11 @@
 
   const loginTab = document.getElementById("loginTab");
   const registerTab = document.getElementById("registerTab");
-
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
-
   const messageBox = document.getElementById("messageBox");
-  const sessionBox = document.getElementById("sessionBox");
-  const sessionEmail = document.getElementById("sessionEmail");
-
   const loginButton = document.getElementById("loginButton");
   const registerButton = document.getElementById("registerButton");
-  const logoutButton = document.getElementById("logoutButton");
-
-  if (!client) {
-    showMessage(
-      "Supabase कनेक्शन शुरू नहीं हुआ। config.js और इंटरनेट कनेक्शन जाँचें।",
-      "error"
-    );
-    loginButton.disabled = true;
-    registerButton.disabled = true;
-    return;
-  }
 
   function showMessage(message, type) {
     messageBox.textContent = message;
@@ -491,45 +475,23 @@
 
   function showTab(tab) {
     clearMessage();
-
     const isLogin = tab === "login";
 
     loginTab.classList.toggle("active", isLogin);
     registerTab.classList.toggle("active", !isLogin);
-
     loginForm.classList.toggle("hidden", !isLogin);
     registerForm.classList.toggle("hidden", isLogin);
   }
 
+  if (!client) {
+    showMessage("Supabase कनेक्शन नहीं हुआ। config.js जाँचें।", "error");
+    loginButton.disabled = true;
+    registerButton.disabled = true;
+    return;
+  }
+
   loginTab.addEventListener("click", () => showTab("login"));
   registerTab.addEventListener("click", () => showTab("register"));
-
-  
-async function refreshSession() {
-  const { data, error } = await client.auth.getSession();
-
-  if (error) {
-    showMessage(error.message, "error");
-    return;
-  }
-
-  if (data.session) {
-    window.location.replace("dashboard.html");
-    return;
-  } else {
-    sessionBox.classList.add("hidden");
-    loginTab.classList.remove("hidden");
-    registerTab.classList.remove("hidden");
-    showTab("login");
-  }
-}
-
-      sessionBox.classList.add("hidden");
-      loginTab.classList.remove("hidden");
-      registerTab.classList.remove("hidden");
-      showTab("login");
-    }
-  }
 
   // REGISTER
   registerForm.addEventListener("submit", async (event) => {
@@ -552,25 +514,22 @@ async function refreshSession() {
         email,
         password,
         options: {
-          data: {
-            full_name: name
-          }
+          data: { full_name: name }
         }
       });
 
       if (error) throw error;
 
       if (data.session) {
-        showMessage("अकाउंट बन गया और Login सफल हुआ!", "success");
-        await refreshSession();
+        showMessage("अकाउंट बन गया! Dashboard खोला जा रहा है।", "success");
+        window.location.href = "dashboard.html";
       } else {
         showMessage(
-          "Registration सफल! कृपया अपने Email Inbox में जाकर Email Verification पूरा करें। उसके बाद Login करें।",
+          "Registration सफल! अपने Email Inbox में Verification पूरा करें, फिर Login करें।",
           "success"
         );
         registerForm.reset();
       }
-
     } catch (error) {
       showMessage(error.message || "Registration नहीं हो सका।", "error");
     } finally {
@@ -596,45 +555,49 @@ async function refreshSession() {
 
       if (error) throw error;
 
-      showMessage("Login सफल हुआ!", "success");
-      await refreshSession();
+      if (!data.session) {
+        throw new Error("Login session नहीं मिली। दोबारा प्रयास करें।");
+      }
+
+      showMessage("Login सफल! Dashboard खोला जा रहा है।", "success");
+      window.location.href = "dashboard.html";
 
     } catch (error) {
       showMessage(error.message || "Login नहीं हो सका।", "error");
-    } finally {
       setLoading(loginButton, false, "Login करें");
     }
   });
 
-  // LOGOUT
-  logoutButton.addEventListener("click", async () => {
-    logoutButton.disabled = true;
+  // LOGOUT BUTTON (यदि Session Box मौजूद हो)
+  const logoutButton = document.getElementById("logoutButton");
 
-    try {
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
       const { error } = await client.auth.signOut();
 
-      if (error) throw error;
+      if (error) {
+        showMessage(error.message, "error");
+      } else {
+        window.location.reload();
+      }
+    });
+  }
 
-      showMessage("आप Logout हो गए हैं।", "success");
-      await refreshSession();
+  // SESSION CHECK
+  client.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      showMessage(error.message, "error");
+      return;
+    }
 
-    } catch (error) {
-      showMessage(error.message || "Logout नहीं हो सका।", "error");
-    } finally {
-      logoutButton.disabled = false;
+    if (data.session) {
+      window.location.href = "dashboard.html";
     }
   });
 
-  // AUTH STATE LISTENER
-  client.auth.onAuthStateChange(() => {
-    refreshSession();
-  });
-
-  // INITIAL SESSION CHECK
-  refreshSession();
-
 })();
 </script>
+
 
 </body>
 </html>
