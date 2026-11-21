@@ -601,23 +601,45 @@
     if (checkError) throw checkError;
     if (existingShops && existingShops.length > 0) return;
 
-    const { data, error } = await client.rpc("complete_business_registration", {
-      p_full_name: business.full_name,
-      p_phone: business.phone,
-      p_shop_name: business.shop_name,
-      p_slug: business.slug,
-      p_business_type: business.business_type,
-      p_address: business.address || null,
-      p_city: business.city || null,
-      p_state: business.state || null
-    });
+    // URL नाम अपने-आप बनेगा। यदि वह पहले से मौजूद है तो -2, -3... लगाकर
+    // अगला उपलब्ध नाम आजमाएँ। Unique constraint अंतिम सुरक्षा देता है।
+    const baseSlug = makeSlug(business.slug || business.shop_name) || "business";
+    let data = null;
+    let lastError = null;
+    let finalSlug = "";
 
-    if (error) {
-      throw new Error("आपका Login हो गया है, लेकिन Business Setup पूरा नहीं हुआ: " + error.message);
+    for (let attempt = 1; attempt <= 20; attempt++) {
+      const suffix = attempt === 1 ? "" : "-" + attempt;
+      const candidate = baseSlug.slice(0, 40 - suffix.length).replace(/-+$/g, "") + suffix;
+      const result = await client.rpc("complete_business_registration", {
+        p_full_name: business.full_name,
+        p_phone: business.phone,
+        p_shop_name: business.shop_name,
+        p_slug: candidate,
+        p_business_type: business.business_type,
+        p_address: business.address || null,
+        p_city: business.city || null,
+        p_state: business.state || null
+      });
+
+      if (!result.error) {
+        data = result.data;
+        finalSlug = candidate;
+        break;
+      }
+
+      lastError = result.error;
+      const duplicateSlug = /shops_slug_key|duplicate key value/i.test(result.error.message || "");
+      if (!duplicateSlug) break;
+    }
+
+    if (lastError && !data) {
+      throw new Error("आपका Login हो गया है, लेकिन Business Setup पूरा नहीं हुआ: " + lastError.message);
     }
     if (!data || data.success !== true) {
       throw new Error("Business Setup की पुष्टि नहीं मिली। कृपया दोबारा Login करें।");
     }
+    console.info("RP TOKEN business URL:", finalSlug);
 
     // Pending flag हटाएँ; दुकान बन जाने के बाद इसे दोबारा चलाने की जरूरत नहीं।
     const { error: metadataError } = await client.auth.updateUser({
