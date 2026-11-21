@@ -89,7 +89,7 @@
     }
 
     .main {
-      max-width: 460px;
+      max-width: 560px;
       margin: 10px auto 50px;
       padding: 0 16px;
     }
@@ -162,9 +162,47 @@
       background: #fff;
     }
 
-    input:focus {
+    input:focus, select:focus {
       border-color: #0788cf;
       box-shadow: 0 0 0 3px rgba(8, 136, 207, 0.1);
+    }
+
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d8e0ea;
+      border-radius: 9px;
+      outline: none;
+      font-size: 14px;
+      background: #fff;
+      color: #182338;
+    }
+
+    .admin-link {
+      display: inline-block;
+      margin-top: 13px;
+      color: #0b75b7;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .admin-link:hover { text-decoration: underline; }
+
+    .form-section-title {
+      font-size: 14px;
+      color: #087fc4;
+      font-weight: 800;
+      margin: 20px 0 13px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e8edf4;
+    }
+
+    .field-hint {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 11px;
+      line-height: 1.5;
     }
 
     .submit-btn {
@@ -318,6 +356,10 @@
       </button>
     </div>
 
+    <div style="text-align:right;margin-top:-15px;margin-bottom:16px;">
+      <a class="admin-link" href="admin-login.html">Platform Admin Login →</a>
+    </div>
+
     <div id="messageBox" class="message" role="status" aria-live="polite"></div>
 
     <!-- LOGIN FORM -->
@@ -357,55 +399,96 @@
 
     </form>
 
-    <!-- REGISTER FORM -->
+    <!-- REGISTER FORM: ACCOUNT + FIRST BUSINESS -->
     <form id="registerForm" class="hidden">
 
-      <h2 class="form-title">Create Account</h2>
-
+      <h2 class="form-title">Create Your Business Account</h2>
       <p class="form-subtitle">
-        अपना व्यवसाय डिजिटल बनाने के लिए नया अकाउंट बनाएँ।
+        एक ही Registration में अपना अकाउंट और पहली दुकान / क्लिनिक जोड़ें।
       </p>
 
+      <div class="form-section-title">व्यक्तिगत जानकारी</div>
+
       <div class="field">
-        <label for="fullName">पूरा नाम</label>
-        <input
-          type="text"
-          id="fullName"
-          placeholder="अपना पूरा नाम लिखें"
-          autocomplete="name"
-          minlength="2"
-          maxlength="80"
-          required
-        >
+        <label for="fullName">पूरा नाम *</label>
+        <input type="text" id="fullName" placeholder="अपना पूरा नाम लिखें"
+          autocomplete="name" minlength="2" maxlength="80" required>
       </div>
 
       <div class="field">
-        <label for="registerEmail">Email Address</label>
-        <input
-          type="email"
-          id="registerEmail"
-          placeholder="अपना Email दर्ज करें"
-          autocomplete="email"
-          required
-        >
+        <label for="phone">मोबाइल नंबर *</label>
+        <input type="tel" id="phone" placeholder="10 अंकों का मोबाइल नंबर"
+          autocomplete="tel" inputmode="tel" minlength="10" maxlength="15" required>
       </div>
 
       <div class="field">
-        <label for="registerPassword">Password</label>
-        <input
-          type="password"
-          id="registerPassword"
-          placeholder="कम से कम 8 अक्षर"
-          minlength="8"
-          autocomplete="new-password"
-          required
-        >
+        <label for="registerEmail">Email Address *</label>
+        <input type="email" id="registerEmail" placeholder="अपना Email दर्ज करें"
+          autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="registerPassword">Password *</label>
+        <input type="password" id="registerPassword" placeholder="कम से कम 8 अक्षर"
+          minlength="8" autocomplete="new-password" required>
+      </div>
+
+      <div class="form-section-title">व्यवसाय की जानकारी</div>
+
+      <div class="field">
+        <label for="shopName">दुकान / क्लिनिक / व्यवसाय का नाम *</label>
+        <input type="text" id="shopName" placeholder="जैसे: Rawat Hair Salon"
+          minlength="2" maxlength="100" required>
+      </div>
+
+      <div class="field">
+        <label for="shopSlug">Business URL नाम *</label>
+        <input type="text" id="shopSlug" placeholder="rawat-hair-salon"
+          minlength="3" maxlength="40" pattern="[a-z0-9-]{3,40}" required>
+        <p class="field-hint">यह URL अलग और unique होना चाहिए। केवल छोटे English अक्षर, नंबर और hyphen।</p>
+      </div>
+
+      <div class="field">
+        <label for="businessType">व्यवसाय का प्रकार *</label>
+        <select id="businessType" required>
+          <option value="other">अन्य व्यवसाय</option>
+          <option value="barber">Barber / Hair Salon</option>
+          <option value="salon">Beauty Salon / Spa</option>
+          <option value="clinic">Clinic / Doctor</option>
+          <option value="hospital">Hospital</option>
+          <option value="garage">Garage / Workshop</option>
+          <option value="service_center">Service Center</option>
+          <option value="restaurant">Restaurant / Cafe</option>
+          <option value="retail">Retail Shop</option>
+          <option value="office">Office / Consultancy</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="shopAddress">पूरा पता</label>
+        <input type="text" id="shopAddress" placeholder="मकान / सड़क / मोहल्ला"
+          autocomplete="street-address" maxlength="250">
+      </div>
+
+      <div class="field">
+        <label for="shopCity">शहर / कस्बा *</label>
+        <input type="text" id="shopCity" placeholder="जैसे: Kanpur"
+          autocomplete="address-level2" maxlength="80" required>
+      </div>
+
+      <div class="field">
+        <label for="shopState">राज्य *</label>
+        <input type="text" id="shopState" placeholder="जैसे: Uttar Pradesh"
+          autocomplete="address-level1" maxlength="80" required>
       </div>
 
       <button class="submit-btn" id="registerButton" type="submit">
-        Register करें
+        अकाउंट और व्यवसाय बनाएँ
       </button>
 
+      <p class="field-hint" style="margin-top:12px;">
+        Registration के बाद Email Verification जरूरी हो सकता है। Verify करके Login करने पर आपका व्यवसाय अपने-आप तैयार होगा।
+      </p>
     </form>
 
     <!-- LOGGED IN SESSION -->
@@ -417,7 +500,7 @@
 
       <p class="form-subtitle">
         आपका अकाउंट सफलतापूर्वक जुड़ गया है।
-        अगला चरण Business Dashboard बनाना है।
+        आपका Business Workspace तैयार है।
       </p>
 
       <button class="logout-btn" id="logoutButton" type="button">
@@ -449,7 +532,6 @@
   "use strict";
 
   const client = window.supabaseClient;
-
   const loginTab = document.getElementById("loginTab");
   const registerTab = document.getElementById("registerTab");
   const loginForm = document.getElementById("loginForm");
@@ -476,11 +558,74 @@
   function showTab(tab) {
     clearMessage();
     const isLogin = tab === "login";
-
     loginTab.classList.toggle("active", isLogin);
     registerTab.classList.toggle("active", !isLogin);
     loginForm.classList.toggle("hidden", !isLogin);
     registerForm.classList.toggle("hidden", isLogin);
+  }
+
+  function makeSlug(value) {
+    return value.toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40);
+  }
+
+  function getBusinessMetadata(user) {
+    const meta = (user && user.user_metadata) || {};
+    if (meta.rp_token_registration_pending !== true) return null;
+    return {
+      full_name: meta.full_name || "",
+      phone: meta.phone || "",
+      shop_name: meta.rp_token_shop_name || "",
+      slug: meta.rp_token_shop_slug || "",
+      business_type: meta.rp_token_business_type || "other",
+      address: meta.rp_token_address || "",
+      city: meta.rp_token_city || "",
+      state: meta.rp_token_state || ""
+    };
+  }
+
+  // Email verification ke baad login par bhi business metadata auth account me available rahega.
+  async function finishBusinessRegistration(user) {
+    const business = getBusinessMetadata(user);
+    if (!business) return;
+
+    // Existing owners ke shops ko dobara create karne se bachata hai.
+    const { data: existingShops, error: checkError } = await client
+      .from("shops")
+      .select("id")
+      .eq("owner_id", user.id)
+      .limit(1);
+
+    if (checkError) throw checkError;
+    if (existingShops && existingShops.length > 0) return;
+
+    const { data, error } = await client.rpc("complete_business_registration", {
+      p_full_name: business.full_name,
+      p_phone: business.phone,
+      p_shop_name: business.shop_name,
+      p_slug: business.slug,
+      p_business_type: business.business_type,
+      p_address: business.address || null,
+      p_city: business.city || null,
+      p_state: business.state || null
+    });
+
+    if (error) {
+      throw new Error("आपका Login हो गया है, लेकिन Business Setup पूरा नहीं हुआ: " + error.message);
+    }
+    if (!data || data.success !== true) {
+      throw new Error("Business Setup की पुष्टि नहीं मिली। कृपया दोबारा Login करें।");
+    }
+
+    // Pending flag हटाएँ; दुकान बन जाने के बाद इसे दोबारा चलाने की जरूरत नहीं।
+    const { error: metadataError } = await client.auth.updateUser({
+      data: { rp_token_registration_pending: false }
+    });
+    if (metadataError) {
+      console.warn("Business बना है, लेकिन metadata flag update नहीं हुआ:", metadataError.message);
+    }
   }
 
   if (!client) {
@@ -493,108 +638,130 @@
   loginTab.addEventListener("click", () => showTab("login"));
   registerTab.addEventListener("click", () => showTab("register"));
 
-  // REGISTER
+  const shopNameInput = document.getElementById("shopName");
+  const shopSlugInput = document.getElementById("shopSlug");
+  let slugWasEdited = false;
+
+  shopNameInput.addEventListener("input", () => {
+    if (!slugWasEdited) shopSlugInput.value = makeSlug(shopNameInput.value);
+  });
+  shopSlugInput.addEventListener("input", () => {
+    slugWasEdited = true;
+    shopSlugInput.value = shopSlugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+  });
+
+  // REGISTER: auth account create; verified login ke baad RPC se shop create.
   registerForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
 
-    const name = document.getElementById("fullName").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+    const phone = document.getElementById("phone").value.trim();
     const email = document.getElementById("registerEmail").value.trim();
     const password = document.getElementById("registerPassword").value;
+    const shopName = shopNameInput.value.trim();
+    const slug = shopSlugInput.value.trim();
+    const businessType = document.getElementById("businessType").value;
+    const address = document.getElementById("shopAddress").value.trim();
+    const city = document.getElementById("shopCity").value.trim();
+    const state = document.getElementById("shopState").value.trim();
 
-    if (name.length < 2) {
-      showMessage("कृपया अपना सही नाम दर्ज करें।", "error");
-      return;
-    }
+    const digits = phone.replace(/\D/g, "");
+    if (fullName.length < 2) return showMessage("कृपया अपना सही नाम दर्ज करें।", "error");
+    if (digits.length < 10 || digits.length > 15) return showMessage("कृपया सही मोबाइल नंबर दर्ज करें।", "error");
+    if (shopName.length < 2) return showMessage("व्यवसाय का सही नाम दर्ज करें।", "error");
+    if (!/^[a-z0-9-]{3,40}$/.test(slug)) return showMessage("Business URL 3 से 40 अक्षरों का होना चाहिए।", "error");
+    if (!city || !state) return showMessage("शहर और राज्य दर्ज करना जरूरी है।", "error");
 
-    setLoading(registerButton, true, "Register करें");
+    setLoading(registerButton, true, "अकाउंट और व्यवसाय बनाएँ");
 
     try {
       const { data, error } = await client.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: name }
+          data: {
+            full_name: fullName,
+            phone: phone,
+            rp_token_registration_pending: true,
+            rp_token_shop_name: shopName,
+            rp_token_shop_slug: slug,
+            rp_token_business_type: businessType,
+            rp_token_address: address,
+            rp_token_city: city,
+            rp_token_state: state
+          }
         }
       });
 
       if (error) throw error;
 
-      if (data.session) {
-        showMessage("अकाउंट बन गया! Dashboard खोला जा रहा है।", "success");
+      if (data.session && data.user) {
+        await finishBusinessRegistration(data.user);
+        showMessage("अकाउंट और व्यवसाय सफलतापूर्वक बन गए! Dashboard खोला जा रहा है।", "success");
         window.location.href = "dashboard.html";
       } else {
         showMessage(
-          "Registration सफल! अपने Email Inbox में Verification पूरा करें, फिर Login करें।",
+          "Registration सफल! अपने Email Inbox में Verification लिंक खोलें। इसके बाद इसी Email और Password से Login करें। Login पर आपका व्यवसाय अपने-आप बन जाएगा।",
           "success"
         );
         registerForm.reset();
+        slugWasEdited = false;
       }
     } catch (error) {
       showMessage(error.message || "Registration नहीं हो सका।", "error");
     } finally {
-      setLoading(registerButton, false, "Register करें");
+      setLoading(registerButton, false, "अकाउंट और व्यवसाय बनाएँ");
     }
   });
 
-  // LOGIN
+  // LOGIN: old users normal dashboard; pending new registrations complete their first shop.
   loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
 
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
-
     setLoading(loginButton, true, "Login करें");
 
     try {
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password
-      });
-
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      if (!data.session || !data.user) throw new Error("Login session नहीं मिली। दोबारा प्रयास करें।");
 
-      if (!data.session) {
-        throw new Error("Login session नहीं मिली। दोबारा प्रयास करें।");
-      }
-
+      await finishBusinessRegistration(data.user);
       showMessage("Login सफल! Dashboard खोला जा रहा है।", "success");
       window.location.href = "dashboard.html";
-
     } catch (error) {
       showMessage(error.message || "Login नहीं हो सका।", "error");
       setLoading(loginButton, false, "Login करें");
     }
   });
 
-  // LOGOUT BUTTON (यदि Session Box मौजूद हो)
   const logoutButton = document.getElementById("logoutButton");
-
   if (logoutButton) {
     logoutButton.addEventListener("click", async () => {
       const { error } = await client.auth.signOut();
-
-      if (error) {
-        showMessage(error.message, "error");
-      } else {
-        window.location.reload();
-      }
+      if (error) showMessage(error.message, "error");
+      else window.location.reload();
     });
   }
 
-  // SESSION CHECK
-  client.auth.getSession().then(({ data, error }) => {
+  // Existing active session check; complete pending registration if required.
+  client.auth.getSession().then(async ({ data, error }) => {
     if (error) {
       showMessage(error.message, "error");
       return;
     }
-
-    if (data.session) {
-      window.location.href = "dashboard.html";
+    if (data.session && data.session.user) {
+      try {
+        await finishBusinessRegistration(data.session.user);
+        window.location.href = "dashboard.html";
+      } catch (setupError) {
+        showMessage(setupError.message || "Business Setup पूरा नहीं हुआ।", "error");
+      }
     }
   });
-
 })();
 </script>
 
