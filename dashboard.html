@@ -4,278 +4,580 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101827">
-<title>RP TOKEN | Business Dashboard</title>
+<meta name="theme-color" content="#111827">
+<title>RP TOKEN | Premium Business Dashboard</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
+
+:root{
+ --navy:#111827;
+ --navy2:#172554;
+ --blue:#2563eb;
+ --cyan:#06b6d4;
+ --purple:#7c3aed;
+ --bg:#f4f6fc;
+ --text:#172033;
+ --muted:#718096;
+ --border:#e7ebf3;
+ --white:#fff;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f3f6fb;color:#182338;min-height:100vh}
-header{background:#101827;color:white;padding:17px 6%;display:flex;justify-content:space-between;align-items:center}
-.brand{font-size:23px;font-weight:800}
-.brand span{color:#38bdf8}
-.logout{background:#dc2626;color:white;border:0;border-radius:7px;padding:10px 15px;cursor:pointer}
-.container{max-width:950px;margin:35px auto;padding:0 16px}
-.welcome{margin-bottom:25px}
-.welcome h1{font-size:27px;margin-bottom:8px}
-.welcome p{color:#64748b;font-size:14px}
+body{
+ font-family:Inter,'Noto Sans Devanagari',Arial,sans-serif;
+ background:var(--bg);color:var(--text);min-height:100vh;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+ width:250px;flex-shrink:0;background:linear-gradient(180deg,#111827,#172554 75%,#1e1b4b);
+ color:white;padding:25px 17px;display:flex;flex-direction:column;
+ position:fixed;left:0;top:0;bottom:0;z-index:10;
+}
+.brand{
+ display:flex;align-items:center;gap:11px;
+ padding:5px 9px 30px;
+}
+.brand-icon{
+ width:42px;height:42px;border-radius:13px;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,#06b6d4,#2563eb);
+ font-size:21px;font-weight:900;
+ box-shadow:0 6px 20px #0891b255;
+}
+.brand-name{font-size:21px;font-weight:900;letter-spacing:.5px}
+.brand-name span{color:#38bdf8}
+.brand-sub{font-size:9px;color:#94a3b8;letter-spacing:2px;margin-top:3px}
+.nav-label{
+ font-size:10px;text-transform:uppercase;letter-spacing:1.6px;
+ color:#8190aa;font-weight:800;padding:13px 12px 10px;
+}
+.nav-link{
+ display:flex;align-items:center;gap:12px;
+ padding:12px 13px;border-radius:10px;color:#cbd5e1;
+ text-decoration:none;font-size:13px;font-weight:600;
+ margin:3px 0;transition:.2s;
+}
+.nav-link:hover,.nav-link.active{
+ background:linear-gradient(90deg,#2563eb55,#7c3aed33);
+ color:white;
+}
+.nav-link.active{border-left:3px solid #38bdf8}
+.nav-icon{font-size:17px;width:21px;text-align:center}
+.sidebar-bottom{margin-top:auto}
+.plan-card{
+ padding:15px;border:1px solid #ffffff20;
+ border-radius:13px;background:#ffffff0b;margin:12px 0 17px;
+}
+.plan-title{font-size:12px;font-weight:800}
+.plan-desc{font-size:10px;color:#a5b4c8;line-height:1.6;margin-top:6px}
+.plan-tag{
+ display:inline-block;background:#164e63;color:#67e8f9;
+ border-radius:20px;padding:4px 9px;font-size:9px;
+ font-weight:800;margin-top:10px;
+}
+.profile{
+ border-top:1px solid #ffffff20;padding:16px 5px 3px;
+ display:flex;align-items:center;gap:10px;
+}
+.avatar{
+ width:36px;height:36px;border-radius:50%;
+ background:linear-gradient(135deg,#7c3aed,#06b6d4);
+ display:grid;place-items:center;font-weight:900;
+}
+.profile-name{font-size:12px;font-weight:700}
+.profile-role{font-size:10px;color:#94a3b8;margin-top:3px}
+
+/* MAIN */
+.main{margin-left:250px;width:calc(100% - 250px);min-width:0}
+.topbar{
+ height:76px;background:white;border-bottom:1px solid var(--border);
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 35px;position:sticky;top:0;z-index:5;
+}
+.top-title{font-size:14px;font-weight:800}
+.top-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.date-chip{
+ padding:9px 13px;background:#f8fafc;border:1px solid var(--border);
+ border-radius:9px;color:#64748b;font-size:11px;font-weight:700;
+}
+.logout{
+ border:0;background:#fff1f2;color:#be123c;
+ padding:10px 14px;border-radius:9px;font-size:12px;font-weight:800;
+}
+.logout:hover{background:#ffe4e6}
+.content{max-width:1250px;margin:auto;padding:30px 35px 45px}
+
+/* HERO */
+.hero{
+ border-radius:20px;padding:30px 32px;color:white;
+ background:linear-gradient(115deg,#172554 0%,#1d4ed8 55%,#6d28d9 100%);
+ position:relative;overflow:hidden;
+ box-shadow:0 13px 35px #1d4ed82b;
+}
+.hero:before,.hero:after{
+ content:"";position:absolute;border-radius:50%;
+ background:#ffffff0c;pointer-events:none;
+}
+.hero:before{width:300px;height:300px;right:-70px;top:-170px}
+.hero:after{width:230px;height:230px;right:170px;bottom:-180px}
+.hero-content{position:relative;z-index:1}
+.hero-kicker{
+ font-size:10px;letter-spacing:2px;font-weight:800;
+ color:#bae6fd;text-transform:uppercase;margin-bottom:12px;
+}
+.hero h1{font-size:27px;font-weight:900;line-height:1.35}
+.hero p{font-size:12px;color:#dbeafe;margin-top:9px;line-height:1.7}
+.hero-bottom{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:15px;margin-top:23px;flex-wrap:wrap;
+}
+.hero-badge{
+ background:#ffffff20;border:1px solid #ffffff30;
+ padding:9px 13px;border-radius:9px;font-size:11px;font-weight:700;
+}
+.hero-dot{
+ display:inline-block;width:7px;height:7px;
+ border-radius:50%;background:#4ade80;margin-right:7px;
+}
+
+/* SECTION */
+.section-head{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:12px;margin:29px 0 16px;
+}
+.section-head h2{font-size:17px;font-weight:900}
+.section-head p{font-size:11px;color:var(--muted);margin-top:5px}
+.section-label{
+ color:#2563eb;background:#eff6ff;border-radius:20px;
+ padding:7px 11px;font-size:10px;font-weight:800;
+}
+
+/* CARDS */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.card{background:white;padding:24px;border-radius:15px;border:1px solid #e5eaf1;box-shadow:0 8px 25px rgba(15,23,42,.04)}
-.card h2{font-size:20px;margin-bottom:8px}
-.muted{color:#64748b;font-size:13px;line-height:1.6;margin-bottom:20px}
+.card{
+ background:white;border:1px solid var(--border);
+ border-radius:16px;padding:23px;
+ box-shadow:0 5px 20px #0f172a08;
+}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.card-icon{
+ width:42px;height:42px;border-radius:12px;
+ display:grid;place-items:center;font-size:20px;
+}
+.icon-blue{background:#eff6ff;color:#2563eb}
+.icon-purple{background:#f5f3ff;color:#7c3aed}
+.card h3{font-size:15px;font-weight:900}
+.card-sub{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:20px}
 .field{margin-bottom:15px}
-label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
-input,select{width:100%;padding:12px;border:1px solid #d8e0ea;border-radius:8px;font-size:14px;background:white}
-input:focus,select:focus{outline:2px solid #bae6fd;border-color:#0284c7}
-.primary{width:100%;background:#087fc4;color:white;border:0;border-radius:8px;padding:13px;font-size:14px;font-weight:bold;cursor:pointer}
-.primary:disabled{opacity:.6;cursor:not-allowed}
-.message{display:none;padding:12px;border-radius:8px;font-size:13px;line-height:1.5;margin-bottom:15px;overflow-wrap:anywhere}
-.message.success{display:block;background:#e9f9ef;color:#166534}
-.message.error{display:block;background:#fff0f0;color:#b42318}
-.shop-item{padding:15px;border:1px solid #e2e8f0;border-radius:10px;margin-top:12px}
-.shop-item h3{font-size:16px;margin-bottom:6px}
-.shop-item p{font-size:12px;color:#64748b;line-height:1.6}
-.slug-note{font-size:11px;color:#64748b;margin-top:5px}
-.empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px;border:1px dashed #cbd5e1;border-radius:10px}
-footer{text-align:center;color:#94a3b8;font-size:12px;padding:30px}
+label{display:block;font-size:11px;font-weight:800;margin-bottom:7px;color:#334155}
+input,select{
+ width:100%;padding:12px 13px;border:1px solid #dbe2ed;
+ border-radius:9px;font-size:13px;color:#172033;background:#fff;
+ outline:none;transition:.2s;
+}
+input:focus,select:focus{
+ border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61a;
+}
+input::placeholder{color:#a0aec0}
+.slug-note{font-size:10px;color:#94a3b8;margin-top:6px;line-height:1.5}
+.primary{
+ width:100%;border:0;border-radius:9px;padding:13px;
+ color:white;font-size:12px;font-weight:800;
+ background:linear-gradient(100deg,#2563eb,#4f46e5);
+ box-shadow:0 5px 13px #2563eb30;transition:.2s;
+}
+.primary:hover{transform:translateY(-1px);box-shadow:0 8px 17px #2563eb40}
+.primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.message{
+ display:none;padding:12px 14px;border-radius:9px;
+ font-size:12px;line-height:1.6;margin-bottom:17px;overflow-wrap:anywhere;
+}
+.message.success{display:block;background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
+.message.error{display:block;background:#fff1f2;color:#be123c;border:1px solid #fecdd3}
+
+/* SHOP LIST */
+.shop-list{display:flex;flex-direction:column;gap:12px}
+.shop-item{
+ border:1px solid var(--border);border-radius:12px;
+ padding:15px;transition:.2s;background:#fff;
+}
+.shop-item:hover{border-color:#bfdbfe;box-shadow:0 5px 15px #2563eb0d}
+.shop-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shop-title{font-size:13px;font-weight:900;overflow-wrap:anywhere}
+.shop-mark{
+ width:34px;height:34px;border-radius:10px;flex-shrink:0;
+ display:grid;place-items:center;background:#eff6ff;color:#2563eb;font-size:16px;
+}
+.shop-details{font-size:10px;color:#718096;line-height:1.8;margin-top:9px;overflow-wrap:anywhere}
+.shop-url{
+ display:inline-block;margin-top:10px;padding:6px 9px;
+ border-radius:6px;background:#f1f5f9;color:#475569;
+ font-size:10px;font-weight:700;overflow-wrap:anywhere;
+}
+.empty{
+ padding:27px 15px;text-align:center;color:#94a3b8;
+ font-size:12px;line-height:1.8;
+ border:1px dashed #cbd5e1;border-radius:11px;background:#fafcff;
+}
+.empty-icon{font-size:28px;margin-bottom:8px}
+.footer{
+ text-align:center;color:#94a3b8;font-size:10px;
+ padding:28px 10px 5px;
+}
 .hidden{display:none!important}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.container{margin:25px auto}.card{padding:20px}.welcome h1{font-size:23px}}
+
+/* MOBILE */
+.mobile-brand{display:none}
+@media(max-width:900px){
+ .sidebar{width:215px}
+ .main{margin-left:215px;width:calc(100% - 215px)}
+ .content{padding:25px 22px}
+ .topbar{padding:0 22px}
+}
+@media(max-width:700px){
+ .sidebar{display:none}
+ .main{margin:0;width:100%}
+ .topbar{height:65px;padding:0 16px}
+ .top-title{font-size:13px}
+ .top-sub{font-size:10px}
+ .date-chip{display:none}
+ .content{padding:19px 14px 35px}
+ .hero{padding:24px 21px;border-radius:16px}
+ .hero h1{font-size:23px}
+ .hero p{font-size:11px}
+ .grid{grid-template-columns:1fr;gap:15px}
+ .card{padding:19px}
+ .section-head{margin-top:24px}
+ .mobile-brand{
+  display:flex;align-items:center;gap:8px;
+  font-size:16px;font-weight:900;color:#172554;
+ }
+ .mobile-brand span{color:#0284c7}
+ .top-actions{gap:7px}
+ .logout{padding:9px 10px;font-size:10px}
+}
 </style>
 </head>
 
 <body>
-<header>
-  <div class="brand">RP <span>TOKEN</span></div>
-  <button class="logout" id="logoutBtn">Logout</button>
+<div class="layout">
+
+<aside class="sidebar">
+ <div class="brand">
+  <div class="brand-icon">R</div>
+  <div>
+   <div class="brand-name">RP <span>TOKEN</span></div>
+   <div class="brand-sub">SMART QUEUE SYSTEM</div>
+  </div>
+ </div>
+
+ <div class="nav-label">MAIN MENU</div>
+ <a href="dashboard.html" class="nav-link active"><span class="nav-icon">⌂</span> Dashboard</a>
+ <a href="manage-queue.html" class="nav-link"><span class="nav-icon">▤</span> Queue Management</a>
+ <a href="services.html" class="nav-link"><span class="nav-icon">✂</span> Services</a>
+ <a href="qr-code.html" class="nav-link"><span class="nav-icon">▦</span> QR Code</a>
+
+ <div class="nav-label">SETTINGS</div>
+ <a href="shop-settings.html" class="nav-link"><span class="nav-icon">⚙</span> Shop Settings</a>
+
+ <div class="sidebar-bottom">
+  <div class="plan-card">
+   <div class="plan-title">RP TOKEN Platform</div>
+   <div class="plan-desc">अपने व्यवसाय को डिजिटल बनाइए और ग्राहकों की लाइन को स्मार्ट तरीके से मैनेज कीजिए।</div>
+   <span class="plan-tag">SMART BUSINESS</span>
+  </div>
+  <div class="profile">
+   <div class="avatar">RP</div>
+   <div>
+    <div class="profile-name">Business Owner</div>
+    <div class="profile-role">Account Dashboard</div>
+   </div>
+  </div>
+ </div>
+</aside>
+
+<div class="main">
+
+<header class="topbar">
+ <div>
+  <div class="mobile-brand">RP <span>TOKEN</span></div>
+  <div class="top-title">Business Workspace</div>
+  <div class="top-sub">Manage your business in one place</div>
+ </div>
+ <div class="top-actions">
+  <div class="date-chip" id="todayDate">आज</div>
+  <button class="logout" id="logoutBtn">↪ Logout</button>
+ </div>
 </header>
 
-<main class="container">
-  <section class="welcome">
-    <h1>Business Dashboard</h1>
-    <p>अपनी दुकान बनाएँ और डिजिटल टोकन सिस्टम शुरू करें।</p>
+<main class="content">
+
+ <section class="hero">
+  <div class="hero-content">
+   <div class="hero-kicker">WELCOME TO RP TOKEN</div>
+   <h1>आपका Business Dashboard</h1>
+   <p>अपने व्यवसाय को डिजिटल बनाइए। टोकन, सेवाएँ और ग्राहक प्रबंधन<br>
+   अब एक ही जगह से आसान तरीके से करें।</p>
+   <div class="hero-bottom">
+    <div class="hero-badge"><span class="hero-dot"></span> आपका Workspace तैयार है</div>
+    <div class="hero-badge">✦ Smart Queue Management</div>
+   </div>
+  </div>
+ </section>
+
+ <div id="message" class="message" role="status" aria-live="polite"></div>
+
+ <div class="section-head">
+  <div>
+   <h2>Business Management</h2>
+   <p>अपनी दुकान जोड़ें या पहले से बनी दुकानों को देखें।</p>
+  </div>
+  <span class="section-label">OWNER PANEL</span>
+ </div>
+
+ <div class="grid">
+
+  <section class="card">
+   <div class="card-head">
+    <div class="card-icon icon-blue">＋</div>
+    <h3>नई दुकान जोड़ें</h3>
+   </div>
+   <p class="card-sub">अपनी दुकान की जानकारी भरें। दुकान बन जाने पर आप उसके Owner होंगे।</p>
+
+   <form id="shopForm">
+    <div class="field">
+     <label for="shopName">दुकान / व्यवसाय का नाम *</label>
+     <input id="shopName" type="text" maxlength="100"
+      placeholder="जैसे: Rawat Hair Salon" required>
+    </div>
+
+    <div class="field">
+     <label for="shopSlug">दुकान का URL नाम *</label>
+     <input id="shopSlug" type="text" minlength="3" maxlength="40"
+      pattern="[a-z0-9-]{3,40}" placeholder="rawat-hair-salon" required>
+     <p class="slug-note">केवल छोटे English अक्षर, नंबर और hyphen इस्तेमाल करें। यह नाम अलग होना चाहिए।</p>
+    </div>
+
+    <div class="field">
+     <label for="businessType">व्यवसाय का प्रकार *</label>
+     <select id="businessType" required>
+      <option value="other">अन्य व्यवसाय</option>
+      <option value="barber">Barber / Hair Salon</option>
+      <option value="salon">Beauty Salon / Spa</option>
+      <option value="clinic">Clinic / Doctor</option>
+      <option value="hospital">Hospital</option>
+      <option value="garage">Garage / Workshop</option>
+      <option value="service_center">Service Center</option>
+      <option value="restaurant">Restaurant / Cafe</option>
+      <option value="retail">Retail Shop</option>
+      <option value="office">Office / Consultancy</option>
+     </select>
+    </div>
+
+    <div class="field">
+     <label for="city">शहर / कस्बा</label>
+     <input id="city" type="text" maxlength="80" placeholder="जैसे: Lucknow">
+    </div>
+
+    <button class="primary" id="createBtn" type="submit">＋ &nbsp; दुकान बनाएँ</button>
+   </form>
   </section>
 
-  <div id="message" class="message" role="status" aria-live="polite"></div>
+  <section class="card">
+   <div class="card-head">
+    <div class="card-icon icon-purple">▣</div>
+    <h3>मेरे व्यवसाय</h3>
+   </div>
+   <p class="card-sub">आपके अकाउंट से जुड़ी दुकानें यहाँ दिखाई देंगी।</p>
+   <div id="shopList" class="shop-list">
+    <div class="empty">दुकानों की जानकारी लोड हो रही है...</div>
+   </div>
+  </section>
 
-  <div class="grid">
-    <section class="card">
-      <h2>नई दुकान जोड़ें</h2>
-      <p class="muted">अपनी दुकान की जानकारी भरें। दुकान बन जाने पर आप उसके Owner होंगे।</p>
+ </div>
 
-      <form id="shopForm">
-        <div class="field">
-          <label for="shopName">दुकान / व्यवसाय का नाम *</label>
-          <input id="shopName" type="text" maxlength="100"
-                 placeholder="जैसे: Rawat Hair Salon" required>
-        </div>
+ <div class="footer">
+  © 2026 RP TOKEN · Smart Queue Management Platform<br>
+  Designed for modern businesses
+ </div>
 
-        <div class="field">
-          <label for="shopSlug">दुकान का URL नाम *</label>
-          <input id="shopSlug" type="text" minlength="3" maxlength="40"
-                 pattern="[a-z0-9-]{3,40}"
-                 placeholder="rawat-hair-salon" required>
-          <p class="slug-note">केवल छोटे English अक्षर, नंबर और hyphen इस्तेमाल करें। यह नाम अलग होना चाहिए।</p>
-        </div>
-
-        <div class="field">
-          <label for="businessType">व्यवसाय का प्रकार *</label>
-          <select id="businessType" required>
-            <option value="other">अन्य व्यवसाय</option>
-            <option value="barber">Barber / Hair Salon</option>
-            <option value="salon">Beauty Salon / Spa</option>
-            <option value="clinic">Clinic / Doctor</option>
-            <option value="hospital">Hospital</option>
-            <option value="garage">Garage / Workshop</option>
-            <option value="service_center">Service Center</option>
-            <option value="restaurant">Restaurant / Cafe</option>
-            <option value="retail">Retail Shop</option>
-            <option value="office">Office / Consultancy</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="city">शहर / कस्बा</label>
-          <input id="city" type="text" maxlength="80"
-                 placeholder="जैसे: Lucknow">
-        </div>
-
-        <button class="primary" id="createBtn" type="submit">
-          दुकान बनाएँ
-        </button>
-      </form>
-    </section>
-
-    <section class="card">
-      <h2>मेरे व्यवसाय</h2>
-      <p class="muted">आपके अकाउंट से जुड़ी दुकानें यहाँ दिखाई देंगी।</p>
-      <div id="shopList">
-        <div class="empty">दुकानों की जानकारी लोड हो रही है...</div>
-      </div>
-    </section>
-  </div>
 </main>
-
-<footer>RP TOKEN — Smart Queue Management Platform</footer>
+</div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="assets/js/config.js"></script>
 
 <script>
 (() => {
-  "use strict";
+"use strict";
 
-  const db = window.supabaseClient;
-  const message = document.getElementById("message");
-  const form = document.getElementById("shopForm");
-  const createBtn = document.getElementById("createBtn");
-  const shopList = document.getElementById("shopList");
+const db = window.supabaseClient;
+const message = document.getElementById("message");
+const form = document.getElementById("shopForm");
+const createBtn = document.getElementById("createBtn");
+const shopList = document.getElementById("shopList");
 
-  if (!db) {
-    showMessage("Supabase कनेक्शन नहीं मिला। config.js जाँचें।", "error");
-    return;
-  }
+if (!db) {
+ showMessage("Supabase कनेक्शन नहीं मिला। config.js जाँचें।", "error");
+ return;
+}
 
-  function showMessage(text, type) {
-    message.textContent = text;
-    message.className = "message " + type;
-  }
+function showMessage(text,type) {
+ message.textContent=text;
+ message.className="message "+type;
+}
 
-  function clearMessage() {
-    message.textContent = "";
-    message.className = "message";
-  }
+function clearMessage() {
+ message.textContent="";
+ message.className="message";
+}
 
-  function makeSlug(value) {
-    return value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 40);
-  }
+function makeSlug(value) {
+ return value.toLowerCase().trim()
+  .replace(/[^a-z0-9]+/g,"-")
+  .replace(/^-+|-+$/g,"")
+  .slice(0,40);
+}
 
-  document.getElementById("shopName").addEventListener("input", (event) => {
-    const slugInput = document.getElementById("shopSlug");
-    if (!slugInput.dataset.edited) {
-      slugInput.value = makeSlug(event.target.value);
-    }
+document.getElementById("todayDate").textContent =
+ new Date().toLocaleDateString("hi-IN",{
+  day:"numeric",month:"long",year:"numeric"
+ });
+
+document.getElementById("shopName").addEventListener("input",event=>{
+ const slugInput=document.getElementById("shopSlug");
+ if(!slugInput.dataset.edited) slugInput.value=makeSlug(event.target.value);
+});
+
+document.getElementById("shopSlug").addEventListener("input",event=>{
+ event.target.dataset.edited="true";
+ event.target.value=event.target.value.toLowerCase().replace(/[^a-z0-9-]/g,"");
+});
+
+async function loadShops() {
+ shopList.replaceChildren();
+
+ const {data,error}=await db.from("shops")
+  .select("id,name,slug,business_type,city,created_at")
+  .order("created_at",{ascending:false});
+
+ if(error) {
+  shopList.textContent="दुकानों की जानकारी लोड नहीं हुई: "+error.message;
+  return;
+ }
+
+ if(!data || data.length===0) {
+  const empty=document.createElement("div");
+  empty.className="empty";
+  empty.innerHTML='<div class="empty-icon">🏪</div>अभी कोई दुकान नहीं बनाई गई है।<br>बाईं ओर से अपनी पहली दुकान बनाएँ।';
+  shopList.appendChild(empty);
+  return;
+ }
+
+ data.forEach(shop=>{
+  const item=document.createElement("div");
+  item.className="shop-item";
+
+  const top=document.createElement("div");
+  top.className="shop-top";
+
+  const title=document.createElement("div");
+  title.className="shop-title";
+  title.textContent=shop.name;
+
+  const mark=document.createElement("div");
+  mark.className="shop-mark";
+  mark.textContent="🏪";
+
+  top.append(title,mark);
+
+  const details=document.createElement("div");
+  details.className="shop-details";
+  details.textContent="प्रकार: "+(shop.business_type || "अन्य")+
+   (shop.city ? "  •  शहर: "+shop.city : "");
+
+  const url=document.createElement("div");
+  url.className="shop-url";
+  url.textContent="URL: "+shop.slug;
+
+  item.append(top,details,url);
+  shopList.appendChild(item);
+ });
+}
+
+form.addEventListener("submit",async event=>{
+ event.preventDefault();
+ clearMessage();
+
+ const name=document.getElementById("shopName").value.trim();
+ const slug=document.getElementById("shopSlug").value.trim();
+ const type=document.getElementById("businessType").value;
+ const city=document.getElementById("city").value.trim();
+
+ if(name.length<2) {
+  showMessage("दुकान का सही नाम दर्ज करें।","error");
+  return;
+ }
+
+ if(!/^[a-z0-9-]{3,40}$/.test(slug)) {
+  showMessage("URL नाम 3 से 40 अक्षरों का होना चाहिए। केवल a-z, 0-9 और hyphen इस्तेमाल करें।","error");
+  return;
+ }
+
+ createBtn.disabled=true;
+ createBtn.textContent="दुकान बनाई जा रही है...";
+
+ try {
+  const {data,error}=await db.rpc("create_shop",{
+   p_name:name,
+   p_slug:slug,
+   p_business_type:type,
+   p_city:city || null
   });
 
-  document.getElementById("shopSlug").addEventListener("input", (event) => {
-    event.target.dataset.edited = "true";
-    event.target.value = event.target.value
-      .toLowerCase()
-      .replace(/[^a-z0-9-]/g, "");
-  });
+  if(error) throw error;
+  if(!data || !data.success) throw new Error("दुकान बनाने की पुष्टि नहीं मिली।");
 
-  async function loadShops() {
-    shopList.replaceChildren();
+  showMessage("बधाई हो! आपकी दुकान सफलतापूर्वक बन गई है।","success");
+  form.reset();
+  document.getElementById("shopSlug").dataset.edited="";
+  await loadShops();
 
-    const { data, error } = await db
-      .from("shops")
-      .select("id,name,slug,business_type,city,created_at")
-      .order("created_at", { ascending: false });
+ } catch(error) {
+  showMessage(error.message || "दुकान नहीं बन सकी।","error");
+ } finally {
+  createBtn.disabled=false;
+  createBtn.textContent="＋  दुकान बनाएँ";
+ }
+});
 
-    if (error) {
-      shopList.textContent = "दुकानों की जानकारी लोड नहीं हुई: " + error.message;
-      return;
-    }
+document.getElementById("logoutBtn").addEventListener("click",async()=>{
+ const {error}=await db.auth.signOut();
+ if(error) {
+  showMessage(error.message,"error");
+  return;
+ }
+ window.location.href="index.html";
+});
 
-    if (!data || data.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "empty";
-      empty.textContent = "अभी कोई दुकान नहीं बनाई गई है।";
-      shopList.appendChild(empty);
-      return;
-    }
+async function initialize() {
+ const {data,error}=await db.auth.getSession();
 
-    data.forEach((shop) => {
-      const item = document.createElement("div");
-      item.className = "shop-item";
+ if(error || !data.session) {
+  window.location.href="index.html";
+  return;
+ }
 
-      const title = document.createElement("h3");
-      title.textContent = shop.name;
+ await loadShops();
+}
 
-      const details = document.createElement("p");
-      details.textContent =
-        "URL: " + shop.slug +
-        " | प्रकार: " + shop.business_type +
-        (shop.city ? " | शहर: " + shop.city : "");
-
-      item.append(title, details);
-      shopList.appendChild(item);
-    });
-  }
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearMessage();
-
-    const name = document.getElementById("shopName").value.trim();
-    const slug = document.getElementById("shopSlug").value.trim();
-    const type = document.getElementById("businessType").value;
-    const city = document.getElementById("city").value.trim();
-
-    if (name.length < 2) {
-      showMessage("दुकान का सही नाम दर्ज करें।", "error");
-      return;
-    }
-
-    if (!/^[a-z0-9-]{3,40}$/.test(slug)) {
-      showMessage("URL नाम 3 से 40 अक्षरों का होना चाहिए। केवल a-z, 0-9 और hyphen इस्तेमाल करें।", "error");
-      return;
-    }
-
-    createBtn.disabled = true;
-    createBtn.textContent = "दुकान बनाई जा रही है...";
-
-    try {
-      const { data, error } = await db.rpc("create_shop", {
-        p_name: name,
-        p_slug: slug,
-        p_business_type: type,
-        p_city: city || null
-      });
-
-      if (error) throw error;
-
-      if (!data || !data.success) {
-        throw new Error("दुकान बनाने की पुष्टि नहीं मिली।");
-      }
-
-      showMessage("बधाई हो! आपकी दुकान सफलतापूर्वक बन गई है।", "success");
-      form.reset();
-      document.getElementById("shopSlug").dataset.edited = "";
-      await loadShops();
-
-    } catch (error) {
-      showMessage(error.message || "दुकान नहीं बन सकी।", "error");
-    } finally {
-      createBtn.disabled = false;
-      createBtn.textContent = "दुकान बनाएँ";
-    }
-  });
-
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    const { error } = await db.auth.signOut();
-    if (error) {
-      showMessage(error.message, "error");
-      return;
-    }
-    window.location.href = "index.html";
-  });
-
-  async function initialize() {
-    const { data, error } = await db.auth.getSession();
-
-    if (error || !data.session) {
-      window.location.href = "index.html";
-      return;
-    }
-
-    await loadShops();
-  }
-
-  initialize();
+initialize();
 })();
 </script>
 </body>
