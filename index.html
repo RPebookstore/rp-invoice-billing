@@ -512,16 +512,17 @@
       return;
     }
 
-    if (data.session) {
-      loginForm.classList.add("hidden");
-      registerForm.classList.add("hidden");
-
-      loginTab.classList.add("hidden");
-      registerTab.classList.add("hidden");
-
-      sessionBox.classList.remove("hidden");
-      sessionEmail.textContent = data.session.user.email || "Logged in";
-    } else {
+   
+if (data.session) {
+  window.location.replace("dashboard.html");
+  return;
+} else {
+  sessionBox.classList.add("hidden");
+  loginTab.classList.remove("hidden");
+  registerTab.classList.remove("hidden");
+  showTab("login");
+}
+ else {
       sessionBox.classList.add("hidden");
       loginTab.classList.remove("hidden");
       registerTab.classList.remove("hidden");
