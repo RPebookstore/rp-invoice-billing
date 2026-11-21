@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>RP TOKEN | Platform Admin Login</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
+:root{--navy:#111827;--navy2:#172554;--blue:#2563eb;--cyan:#06b6d4;--purple:#7c3aed;--ink:#172033;--muted:#718096;--line:#e7ebf3}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,'Noto Sans Devanagari',Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 15%,#dbeafe 0,transparent 32%),radial-gradient(circle at 90% 85%,#ede9fe 0,transparent 30%),#f4f6fc;display:grid;place-items:center;padding:24px}
+.shell{width:min(100%,980px);min-height:590px;background:#fff;border:1px solid #e8edf5;border-radius:26px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;box-shadow:0 25px 80px #17255418}
+.visual{position:relative;padding:48px 42px;color:white;background:linear-gradient(145deg,#101827,#172554 62%,#312e81);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.visual:before,.visual:after{content:"";position:absolute;border:1px solid #ffffff18;border-radius:50%;width:380px;height:380px;right:-190px;top:80px}
+.visual:after{width:260px;height:260px;right:-130px;top:140px}
+.brand{position:relative;z-index:1;display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#06b6d4,#2563eb);font-size:22px;font-weight:900;box-shadow:0 8px 25px #0891b255}
+.brand-name{font-size:22px;font-weight:900;letter-spacing:.5px}.brand-name span{color:#38bdf8}.brand-sub{font-size:9px;color:#a5b4fc;letter-spacing:2px;margin-top:3px}
+.visual-copy{position:relative;z-index:1;margin:55px 0}
+.eyebrow{font-size:10px;letter-spacing:2.2px;font-weight:800;color:#67e8f9;text-transform:uppercase}
+.visual h1{font-size:35px;line-height:1.2;margin:15px 0 14px;letter-spacing:-1.1px}
+.visual-copy p{max-width:360px;color:#cbd5e1;font-size:13px;line-height:1.9}
+.secure{position:relative;z-index:1;border-top:1px solid #ffffff20;padding-top:20px;color:#cbd5e1;font-size:11px;line-height:1.8}
+.secure strong{color:#fff}
+.panel{padding:55px 48px;display:flex;flex-direction:column;justify-content:center}
+.panel h2{font-size:25px;margin:0 0 8px;letter-spacing:-.6px}
+.sub{font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 30px}
+label{display:block;font-size:11px;font-weight:800;color:#344054;margin:17px 0 8px}
+.input-wrap{position:relative}
+input{width:100%;height:49px;border:1px solid #dce3ee;border-radius:12px;padding:0 14px;font:inherit;font-size:13px;outline:none;background:#fbfcff;transition:.2s}
+input:focus{border-color:#3b82f6;box-shadow:0 0 0 4px #3b82f615;background:#fff}
+input::placeholder{color:#a0aaba}
+.password-toggle{position:absolute;right:9px;top:8px;height:33px;border:0;background:transparent;color:#64748b;font-size:11px;font-weight:700;padding:0 8px;cursor:pointer}
+.submit{width:100%;height:50px;border:0;border-radius:12px;margin-top:24px;color:white;font-weight:800;font-size:13px;background:linear-gradient(100deg,#2563eb,#4f46e5 65%,#7c3aed);box-shadow:0 9px 22px #4f46e533;cursor:pointer;transition:.2s}
+.submit:hover{transform:translateY(-1px);box-shadow:0 12px 25px #4f46e544}.submit:disabled{opacity:.65;cursor:wait;transform:none}
+.message{display:none;margin-top:16px;padding:12px 13px;border-radius:11px;font-size:12px;line-height:1.65}
+.message.error{display:block;color:#b42318;background:#fef3f2;border:1px solid #fecdca}
+.message.success{display:block;color:#067647;background:#ecfdf3;border:1px solid #abefc6}
+.links{display:flex;justify-content:space-between;gap:12px;margin-top:24px;font-size:11px}
+.links a{color:#475569;text-decoration:none;font-weight:700}.links a:hover{color:#2563eb}
+.note{font-size:10px;color:#98a2b3;text-align:center;margin-top:28px;line-height:1.7}
+@media(max-width:720px){body{padding:14px}.shell{grid-template-columns:1fr;min-height:0;border-radius:20px}.visual{padding:24px 25px;min-height:210px}.visual-copy{margin:30px 0 8px}.visual h1{font-size:25px;margin:8px 0}.visual-copy p{font-size:11px}.secure{display:none}.panel{padding:34px 25px 30px}.panel h2{font-size:23px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="visual">
+    <div class="brand">
+      <div class="logo">R</div>
+      <div><div class="brand-name">RP <span>TOKEN</span></div><div class="brand-sub">SMART QUEUE MANAGEMENT</div></div>
+    </div>
+    <div class="visual-copy">
+      <div class="eyebrow">CONTROL CENTER</div>
+      <h1>Platform Admin<br>Portal</h1>
+      <p>पूरे RP TOKEN प्लेटफॉर्म, रजिस्टर्ड दुकानों और सिस्टम गतिविधियों को एक सुरक्षित जगह से मैनेज करें।</p>
+    </div>
+    <div class="secure"><strong>🔒 Restricted Access</strong><br>यह लॉगिन केवल अधिकृत Platform Admin के लिए है। Shop Owner अकाउंट से यहाँ प्रवेश नहीं मिलेगा।</div>
+  </section>
+
+  <section class="panel">
+    <div class="eyebrow" style="color:#2563eb">ADMINISTRATOR SIGN IN</div>
+    <h2>Admin Login</h2>
+    <p class="sub">अपने अधिकृत ईमेल और पासवर्ड से लॉगिन करें।</p>
+
+    <form id="loginForm" autocomplete="on">
+      <label for="email">ADMIN EMAIL</label>
+      <input id="email" type="email" placeholder="admin@example.com" autocomplete="username" required>
+      <label for="password">PASSWORD</label>
+      <div class="input-wrap">
+        <input id="password" type="password" placeholder="अपना पासवर्ड दर्ज करें" autocomplete="current-password" required>
+        <button class="password-toggle" type="button" id="togglePassword">SHOW</button>
+      </div>
+      <button class="submit" id="loginBtn" type="submit">Secure Login&nbsp; →</button>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="links">
+      <a href="index.html">← मुख्य वेबसाइट</a>
+      <a href="index.html">Business Owner Login</a>
+    </div>
+    <div class="note">Protected by RP TOKEN authentication<br>किसी दूसरे व्यक्ति के साथ अपना पासवर्ड साझा न करें।</div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script>
+(() => {
+  "use strict";
+  const db = window.supabaseClient;
+  const form = document.getElementById("loginForm");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const loginBtn = document.getElementById("loginBtn");
+  const message = document.getElementById("message");
+  const togglePassword = document.getElementById("togglePassword");
+
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "message " + type;
+  }
+  function setLoading(loading) {
+    loginBtn.disabled = loading;
+    loginBtn.textContent = loading ? "Verifying Admin Access..." : "Secure Login  →";
+  }
+  function friendlyError(error) {
+    const raw = (error && error.message) ? error.message : "Login नहीं हो पाया।";
+    if (/invalid login credentials/i.test(raw)) return "ईमेल या पासवर्ड गलत है। कृपया दोबारा जाँचें।";
+    if (/email not confirmed/i.test(raw)) return "पहले अपने ईमेल को verify करें, फिर लॉगिन करें।";
+    if (/fetch|network/i.test(raw)) return "इंटरनेट या Supabase कनेक्शन जाँचें।";
+    return raw;
+  }
+
+  async function verifyPlatformAdmin() {
+    if (!db) throw new Error("Supabase कनेक्शन नहीं मिला। assets/js/config.js जाँचें।");
+    const { data: sessionData, error: sessionError } = await db.auth.getSession();
+    if (sessionError) throw sessionError;
+    const session = sessionData && sessionData.session;
+    if (!session) return false;
+
+    const { data, error } = await db.rpc("is_platform_admin");
+    if (error) throw error;
+    if (data === true) {
+      window.location.replace("admin.html");
+      return true;
+    }
+    showMessage("इस अकाउंट को Platform Admin की अनुमति नहीं है। कृपया अधिकृत Admin ईमेल से लॉगिन करें।", "error");
+    await db.auth.signOut();
+    return false;
+  }
+
+  togglePassword.addEventListener("click", () => {
+    const show = passwordInput.type === "password";
+    passwordInput.type = show ? "text" : "password";
+    togglePassword.textContent = show ? "HIDE" : "SHOW";
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!db) {
+      showMessage("Supabase कनेक्शन नहीं मिला। config.js और इंटरनेट जाँचें।", "error");
+      return;
+    }
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      showMessage("कृपया ईमेल और पासवर्ड दोनों भरें।", "error");
+      return;
+    }
+    setLoading(true);
+    message.className = "message";
+    try {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      const allowed = await verifyPlatformAdmin();
+      if (!allowed) setLoading(false);
+    } catch (error) {
+      showMessage(friendlyError(error), "error");
+      setLoading(false);
+    }
+  });
+
+  (async () => {
+    if (!db) {
+      showMessage("Supabase library/config लोड नहीं हुआ। पेज और assets/js/config.js का path जाँचें।", "error");
+      return;
+    }
+    try {
+      const { data } = await db.auth.getSession();
+      if (data && data.session) {
+        setLoading(true);
+        await verifyPlatformAdmin();
+        setLoading(false);
+      }
+    } catch (error) {
+      showMessage(friendlyError(error), "error");
+      setLoading(false);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
