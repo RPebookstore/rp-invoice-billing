@@ -504,25 +504,26 @@
   loginTab.addEventListener("click", () => showTab("login"));
   registerTab.addEventListener("click", () => showTab("register"));
 
-  async function refreshSession() {
-    const { data, error } = await client.auth.getSession();
+  
+async function refreshSession() {
+  const { data, error } = await client.auth.getSession();
 
-    if (error) {
-      showMessage(error.message, "error");
-      return;
-    }
+  if (error) {
+    showMessage(error.message, "error");
+    return;
+  }
 
-   
-if (data.session) {
-  window.location.replace("dashboard.html");
-  return;
-} else {
-  sessionBox.classList.add("hidden");
-  loginTab.classList.remove("hidden");
-  registerTab.classList.remove("hidden");
-  showTab("login");
+  if (data.session) {
+    window.location.replace("dashboard.html");
+    return;
+  } else {
+    sessionBox.classList.add("hidden");
+    loginTab.classList.remove("hidden");
+    registerTab.classList.remove("hidden");
+    showTab("login");
+  }
 }
- else {
+
       sessionBox.classList.add("hidden");
       loginTab.classList.remove("hidden");
       registerTab.classList.remove("hidden");
