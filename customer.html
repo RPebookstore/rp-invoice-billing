@@ -130,8 +130,8 @@ button:disabled{opacity:.6;cursor:not-allowed}
   <div class="result-shop" id="resultShop"></div>
   <p style="color:#64748b">आपका टोकन सफलतापूर्वक बन गया है!</p>
   <div class="token-number" id="tokenCode"></div>
-  <p id="resultService"></p>
-  <p id="resultTime" class="hint"></p>
+ <p id="resultService"></p>
+<p id="resultTime" class="hint"></p>
   <a id="statusLink" class="status-link" href="#">अपना Live Token Status देखें</a>
   <p class="hint">इस लिंक को सुरक्षित रखें। इससे आप अपनी बारी की स्थिति देख सकते हैं।</p>
  </div>
@@ -299,10 +299,25 @@ $("bookingForm").addEventListener("submit",async event=>{
   $("resultShop").textContent=data.shop_name || shopInfo.shop_name;
   $("tokenCode").textContent=data.token_code || ("T"+data.token_number);
 
-  const service=services.find(s=>s.id===serviceId);
-  $("resultService").textContent="सेवा: "+(service?.name || "");
+ const service=services.find(s=>s.id===serviceId);
+$("resultService").textContent="सेवा: "+(service?.name || "");
 
-  $("resultTime").textContent=
+// Display token booking date from Supabase
+const queueDate = data.queue_date;
+
+if(queueDate){
+ const [year,month,day] = queueDate.split("-").map(Number);
+ const date = new Date(year,month-1,day);
+
+ $("resultDate").textContent =
+  "दिनांक: "+date.toLocaleDateString("hi-IN",{
+   day:"numeric",
+   month:"long",
+   year:"numeric"
+  });
+}
+
+$("resultTime").textContent=
    "टोकन समय: "+new Date().toLocaleTimeString("hi-IN",{
     hour:"2-digit",minute:"2-digit"
    });
